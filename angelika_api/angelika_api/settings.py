@@ -68,7 +68,7 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'NO'
+TIME_ZONE = 'Europe/Oslo'
 
 USE_I18N = True
 
