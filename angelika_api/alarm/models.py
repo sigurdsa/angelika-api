@@ -1,3 +1,5 @@
 from django.db import models
 
-# Create your models here.
+
+class Alarm(models.Model):
+    time_created = models.DateTimeField(null=False)
