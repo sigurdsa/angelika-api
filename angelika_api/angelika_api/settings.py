@@ -36,7 +36,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'alarm'
+    'alarm',
+    'patient',
+    'customuser',
 )
 
 MIDDLEWARE_CLASSES = (
