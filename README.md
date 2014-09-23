@@ -3,6 +3,10 @@ angelika-api
 
 Backend (API) for project Angelika - health tracking
 
+# Virtualenv
+
+Create your virtualenv folder with the name "venv"
+
 # Commands
 
 `make install`
