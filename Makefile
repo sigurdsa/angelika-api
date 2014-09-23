@@ -9,3 +9,7 @@ migrate:
 .PHONY: migrations
 migrations:
 	python manage.py makemigrations
+
+.PHONY: install
+install:
+	pip install -r requirements.txt
