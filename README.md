@@ -21,3 +21,8 @@ Apply migrations, i.e. migrate your database to the newest structure. Creates a 
 
 `make migrations`
 Create migrations. Do this after you have changed one or more models. Commit the migration files along with the changes in the model(s).
+
+#Contribution guideline
+1. Commit changes on seperate branch!
+2. "One" change per branch, easier to review!
+3. `make migrations` should be the last thing you do before commiting changes done in models!!
