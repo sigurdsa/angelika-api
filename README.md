@@ -22,6 +22,9 @@ Apply migrations, i.e. migrate your database to the newest structure. Creates a 
 `make migrations`
 Create migrations. Do this after you have changed one or more models. Commit the migration files along with the changes in the model(s).
 
+`make shell`
+Start the interactive Python shell in your terminal. Here, you can play around with the API Django gives you.
+
 #Contribution guideline
 1. Commit changes on seperate branch!
 2. "One" change per branch, easier to review!

@@ -13,3 +13,7 @@ migrations:
 .PHONY: install
 install:
 	pip install -r requirements.txt
+
+.PHONY: shell
+shell:
+	python manage.py shell
