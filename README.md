@@ -1,7 +1,8 @@
 angelika-api
 ============
 
-Backend (API) for project Angelika - health tracking
+Backend (API) for project Angelika - health tracking  
+The frontend is in a [separate repository](https://github.com/iver56/angelika-web)
 
 # Virtualenv
 
