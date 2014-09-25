@@ -4,9 +4,9 @@ from django.contrib.auth.models import User
 
 class Patient(models.Model):
     user = models.OneToOneField(User, null=True)
-    national_identification_number = models.PositiveSmallIntegerField(
+    national_identification_number = models.CharField(default="",
         max_length=11, help_text=
-        "A number consisting of date of birth + national id, called fødselsnummer, needs to be 11 digits long")
+        "A number consisting of date of birth + national id, called fodselsnummer, needs to be 11 digits long")
     telephone = models.IntegerField(default=None)
     address = models.TextField(default='')
     pulse_max = models.IntegerField(default=0)
