@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
     'alarm',
     'patient',
@@ -90,7 +91,11 @@ STATIC_URL = '/static/'
 REST_FRAMEWORK = {
     # TODO: Switch default permission to IsAuthenticated
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.AllowAny',),
-    'PAGINATE_BY': 100
+    'PAGINATE_BY': 100,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    )
 }
 
 CORS_ORIGIN_WHITELIST = (
