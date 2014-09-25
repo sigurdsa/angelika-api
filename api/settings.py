@@ -40,7 +40,6 @@ INSTALLED_APPS = (
     'corsheaders',
     'alarm',
     'patient',
-    'customuser',
 )
 
 MIDDLEWARE_CLASSES = (
