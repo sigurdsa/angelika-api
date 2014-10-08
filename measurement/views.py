@@ -4,9 +4,9 @@ from .serializers import MeasurementSerializer
 from django.contrib.auth.models import User
 
 
-class AlarmViewSet(viewsets.ModelViewSet):
+class MeasurementViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that shows measurment from one patient
+    API endpoint that shows measurement from one patient
     """
     serializer_class = MeasurementSerializer
 
