@@ -12,7 +12,7 @@ class MeasurementViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Measurement.objects.none()
-        username = self.request.QUERY_PARAMS.get('user_id', None)
-        if username is not None:
-            queryset = queryset.filter(purchaser__username=username)
+        user_id = self.request.QUERY_PARAMS.get('user_id', None)
+        if user_id is not None:
+            queryset = queryset.filter(user__id=user_id)
         return queryset
