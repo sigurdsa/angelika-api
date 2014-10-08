@@ -7,4 +7,4 @@ class Measurement(models.Model):
     patient = models.ForeignKey(Patient)
     type = models.TextField(default='')
     value = models.FloatField(default=0)
-    time_created = models.DateTimeField(null=False)
+    time = models.DateTimeField(null=False)
