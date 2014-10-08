@@ -11,14 +11,14 @@ class Patient(models.Model):
     )
     telephone = models.IntegerField(default=None)
     address = models.TextField(default='')
-    pulse_max = models.IntegerField(default=0)
-    pulse_min = models.IntegerField(default=0)
-    o2_max = models.IntegerField(default=0)
-    o2_min = models.IntegerField(default=0)
-    temperature_max = models.IntegerField(default=0)
-    temperature_min = models.IntegerField(default=0)
-    activity_max = models.IntegerField(default=0)
-    activity_min = models.IntegerField(default=0)
+    pulse_max = models.FloatField(default=0)
+    pulse_min = models.FloatField(default=0)
+    o2_max = models.FloatField(default=0)
+    o2_min = models.FloatField(default=0)
+    temperature_max = models.FloatField(default=0)
+    temperature_min = models.FloatField(default=0)
+    activity_max = models.FloatField(default=0)
+    activity_min = models.FloatField(default=0)
     activity_access = models.BooleanField(
         default=False,
         help_text="If True, the patient has access to view activity data in patient interface"
