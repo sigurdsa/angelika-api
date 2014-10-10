@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 
 class Patient(models.Model):
+    hub_id = models.CharField(max_length=12, null=True)
     user = models.OneToOneField(User, null=True)
     national_identification_number = models.CharField(
         default="",
