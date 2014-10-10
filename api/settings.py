@@ -90,8 +90,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = 'static/'
 
 REST_FRAMEWORK = {
-    # TODO: Switch default permission to IsAuthenticated
-    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.AllowAny',),
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
     'PAGINATE_BY': 100,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
