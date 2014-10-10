@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.encoding import smart_unicode
 
 
 class Patient(models.Model):
@@ -34,3 +35,9 @@ class Patient(models.Model):
         default=False,
         help_text="If True, the patient has access to view temperature data in patient interface"
     )
+
+    def __unicode__(self):
+        name = self.user.first_name + " " + self.user.last_name
+        if len(name) <= 2:
+            name = self.user.username
+        return smart_unicode(name)
