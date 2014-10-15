@@ -4,7 +4,7 @@ from .serializers import MotivationTextSerializer
 
 class MotivationTextViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that shows all alarms
+    API endpoint that shows all MotivationText
     """
     queryset = MotivationText.objects.all()
     serializer_class = MotivationTextSerializer
