@@ -5,4 +5,4 @@ from rest_framework import serializers
 class MotivationTextSerializer(serializers.ModelSerializer):
     class Meta:
         model = MotivationText
-        fields = ('time_created', 'text')
+        fields = ('id', 'time_created', 'text')
