@@ -51,7 +51,8 @@ class PatientListSerializer(serializers.ModelSerializer):
 class PatientDetailSerializer(PatientListSerializer):
     user = SimpleUserSerializer()
     birth_date = serializers.SerializerMethodField('get_birth_date')
-    age=serializers.SerializerMethodField('get_age')
+    age = serializers.SerializerMethodField('get_age')
+
     class Meta:
         model = Patient
         fields = (
