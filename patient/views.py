@@ -15,7 +15,7 @@ class PatientViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, pk=None):
         queryset = Patient.objects.all()
-        user = get_object_or_404(queryset, pk=pk)
-        serializer = PatientDetailSerializer(user)
+        patient = get_object_or_404(queryset, pk=pk)
+        serializer = PatientDetailSerializer(patient)
         return Response(serializer.data)
 

@@ -66,8 +66,6 @@ class PatientDetailSerializer(PatientListSerializer):
             'o2_min',
             'temperature_max',
             'temperature_min',
-            'activity_max',
-            'activity_min',
             'activity_access',
             'pulse_access',
             'o2_access',
