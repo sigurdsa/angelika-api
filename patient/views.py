@@ -6,9 +6,6 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
 
-
-
-
 class PatientViewSet(viewsets.ModelViewSet):
     model=Patient
     def list(self, request):
