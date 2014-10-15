@@ -48,4 +48,26 @@ class PatientListSerializer(serializers.ModelSerializer):
             'telephone'
         )
 
-
+class PatientDetailSerializer(PatientListSerializer):
+    user = SimpleUserSerializer()
+    birth_date = serializers.SerializerMethodField('get_birth_date')
+    age=serializers.SerializerMethodField('get_age')
+    class Meta:
+        model = Patient
+        fields = (
+            'user',
+            'birth_date',
+            'age',
+            'national_identification_number',
+            'telephone',
+            'pulse_max',
+            'pulse_min',
+            'o2_max',
+            'o2_min',
+            'temperature_max',
+            'temperature_min',
+            'activity_access',
+            'pulse_access',
+            'o2_access',
+            'temperature_access'
+        )

@@ -19,8 +19,6 @@ class Patient(models.Model):
     o2_min = models.FloatField(default=0)
     temperature_max = models.FloatField(default=0)
     temperature_min = models.FloatField(default=0)
-    activity_max = models.FloatField(default=0)
-    activity_min = models.FloatField(default=0)
     activity_access = models.BooleanField(
         default=False,
         help_text="If True, the patient has access to view activity data in patient interface"
