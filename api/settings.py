@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'patient',
     'measurement',
     'motivation_text',
+    'next_of_kin',
 )
 
 MIDDLEWARE_CLASSES = (
