@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'alarm',
     'patient',
     'measurement',
+    'motivation_text',
 )
 
 MIDDLEWARE_CLASSES = (
