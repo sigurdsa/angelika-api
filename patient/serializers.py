@@ -23,8 +23,8 @@ class PatientListSerializer(serializers.ModelSerializer):
     age = serializers.SerializerMethodField('get_age')
 
     def get_birth_date(self, obj):
-        return obj.national_identification_number[0:2] + "."\
-            + obj.national_identification_number[2:4] + "."\
+        return obj.national_identification_number[0:2] + "." \
+            + obj.national_identification_number[2:4] + "." \
             + obj.national_identification_number[4:6]
 
     def get_age(self, obj):
@@ -48,6 +48,7 @@ class PatientListSerializer(serializers.ModelSerializer):
             'national_identification_number',
             'telephone'
         )
+
 
 class PatientDetailSerializer(PatientListSerializer):
     user = SimpleUserSerializer()
