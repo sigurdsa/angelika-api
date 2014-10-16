@@ -63,6 +63,7 @@ class PatientDetailSerializer(PatientListSerializer):
             'age',
             'national_identification_number',
             'telephone',
+            'address',
             'pulse_max',
             'pulse_min',
             'o2_max',
