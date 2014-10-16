@@ -41,6 +41,7 @@ class PatientListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patient
         fields = (
+            'id',
             'user',
             'birth_date',
             'age',
@@ -56,6 +57,7 @@ class PatientDetailSerializer(PatientListSerializer):
     class Meta:
         model = Patient
         fields = (
+            'id',
             'user',
             'birth_date',
             'age',
