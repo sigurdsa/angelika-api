@@ -2,7 +2,8 @@ from django.contrib.auth.models import User
 from .models import Patient
 from rest_framework import serializers
 import datetime
-
+from next_of_kin.models import NextOfKin
+from next_of_kin.serializers import NextOfKinSerializer
 
 class SimpleUserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField('get_full_name')
@@ -52,6 +53,12 @@ class PatientDetailSerializer(PatientListSerializer):
     user = SimpleUserSerializer()
     birth_date = serializers.SerializerMethodField('get_birth_date')
     age = serializers.SerializerMethodField('get_age')
+    next_of_kin = serializers.SerializerMethodField('get_next_of_kin')
+
+    def get_next_of_kin(self, obj):
+        next_of_kin = NextOfKin.objects.filter(patient__id=obj.id)
+        serializer = NextOfKinSerializer(next_of_kin, many=True, context=self.context)
+        return serializer.data
 
     class Meta:
         model = Patient
@@ -61,6 +68,7 @@ class PatientDetailSerializer(PatientListSerializer):
             'age',
             'national_identification_number',
             'telephone',
+            'next_of_kin',
             'pulse_max',
             'pulse_min',
             'o2_max',

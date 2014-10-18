@@ -15,3 +15,6 @@ class NextOfKin(models.Model):
     def __unicode__(self):
         name = self.first_name + " " + self.last_name
         return smart_unicode(name)
+
+    class Meta():
+        ordering = ['priority']
