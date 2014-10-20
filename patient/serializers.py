@@ -21,7 +21,7 @@ class SimplePatientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Patient
-        fields = ('user',)
+        fields = ('id', 'user')
 
 
 class PatientListSerializer(serializers.ModelSerializer):
