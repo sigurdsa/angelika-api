@@ -5,6 +5,7 @@ import datetime
 from next_of_kin.models import NextOfKin
 from next_of_kin.serializers import NextOfKinSerializer
 
+
 class SimpleUserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField('get_full_name')
 
@@ -14,6 +15,12 @@ class SimpleUserSerializer(serializers.ModelSerializer):
 
     def get_full_name(self, obj):
         return obj.get_full_name()
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name']
 
 
 class SimplePatientSerializer(serializers.ModelSerializer):
@@ -58,7 +65,7 @@ class PatientListSerializer(serializers.ModelSerializer):
 
 
 class PatientDetailSerializer(PatientListSerializer):
-    user = SimpleUserSerializer()
+    user = UserSerializer()
     birth_date = serializers.SerializerMethodField('get_birth_date')
     age = serializers.SerializerMethodField('get_age')
     next_of_kin = serializers.SerializerMethodField('get_next_of_kin')
@@ -78,6 +85,8 @@ class PatientDetailSerializer(PatientListSerializer):
             'national_identification_number',
             'phone_number',
             'address',
+            'zip_code',
+            'city',
             'next_of_kin',
             'pulse_max',
             'pulse_min',

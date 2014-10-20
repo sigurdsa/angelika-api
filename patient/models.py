@@ -12,7 +12,9 @@ class Patient(models.Model):
         help_text="A number consisting of date of birth + national id, (11 digits)"
     )
     phone_number = models.CharField(max_length=14, blank=True, null=True)
-    address = models.TextField(default='')
+    address = models.CharField(max_length=255, blank=True, null=True)
+    zip_code = models.CharField(max_length=4, blank=True, null=True)
+    city = models.CharField(max_length=120, blank=True, null=True)
     pulse_max = models.FloatField(default=0)
     pulse_min = models.FloatField(default=0)
     o2_max = models.FloatField(default=0)
