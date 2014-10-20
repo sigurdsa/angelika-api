@@ -22,7 +22,8 @@ class Measurement(models.Model):
 
     def __unicode__(self):
         return smart_unicode(
-            self.type + " = " + str(self.value) + " @ " + str(self.time) + " for " + self.patient.user.first_name + " " + self.patient.user.last_name
+            self.type + " = " + str(self.value) + " @ " + str(self.time) + " for " + self.patient.user.first_name
+            + " " + self.patient.user.last_name
         )
 
     class Meta():

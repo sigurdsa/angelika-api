@@ -10,12 +10,18 @@ class SimpleUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = [
-            'full_name',
-        ]
+        fields = ['full_name',]
 
     def get_full_name(self, obj):
         return obj.get_full_name()
+
+
+class SimplePatientSerializer(serializers.ModelSerializer):
+    user = SimpleUserSerializer()
+
+    class Meta:
+        model = Patient
+        fields = ('user',)
 
 
 class PatientListSerializer(serializers.ModelSerializer):

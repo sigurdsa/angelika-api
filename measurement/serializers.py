@@ -1,9 +1,10 @@
 from .models import Measurement
 from rest_framework import serializers
 from calendar import timegm
+from patient.serializers import SimplePatientSerializer
 
 
-class MeasurementSerializer(serializers.ModelSerializer):
+class MeasurementGraphSerializer(serializers.ModelSerializer):
     x = serializers.SerializerMethodField('get_time')
     y = serializers.SerializerMethodField('get_value')
 
@@ -16,3 +17,11 @@ class MeasurementSerializer(serializers.ModelSerializer):
 
     def get_value(self, obj):
         return obj.value
+
+
+class AlarmMeasurementSerializer(serializers.ModelSerializer):
+    patient = SimplePatientSerializer()
+
+    class Meta:
+        model = Measurement
+        fields = ('patient', 'type')
