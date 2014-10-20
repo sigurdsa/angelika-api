@@ -1,5 +1,6 @@
 from django.db import models
 from measurement.models import Measurement
+from django.utils.encoding import smart_unicode
 
 
 class Alarm(models.Model):
@@ -11,3 +12,9 @@ class Alarm(models.Model):
 
     class Meta():
         ordering = ['is_treated', '-time_created']
+
+    def __unicode__(self):
+        s = "Alarm at " + str(self.time_created)
+        if self.measurement:
+            s += " for " + self.measurement.patient.user.get_full_name()
+        return smart_unicode(s)
