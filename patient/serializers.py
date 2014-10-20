@@ -53,7 +53,7 @@ class PatientListSerializer(serializers.ModelSerializer):
             'birth_date',
             'age',
             'national_identification_number',
-            'telephone'
+            'phone_number'
         )
 
 
@@ -76,7 +76,7 @@ class PatientDetailSerializer(PatientListSerializer):
             'birth_date',
             'age',
             'national_identification_number',
-            'telephone',
+            'phone_number',
             'address',
             'next_of_kin',
             'pulse_max',
