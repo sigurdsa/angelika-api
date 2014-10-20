@@ -1,6 +1,6 @@
 from .models import Measurement
 from rest_framework import viewsets
-from .serializers import MeasurementSerializer
+from .serializers import MeasurementGraphSerializer
 from rest_framework.exceptions import ParseError
 
 
@@ -8,7 +8,7 @@ class MeasurementViewSet(viewsets.ModelViewSet):
     """
     API endpoint that shows measurement from one patient
     """
-    serializer_class = MeasurementSerializer
+    serializer_class = MeasurementGraphSerializer
 
     def get_queryset(self):
         patient_id = self.request.QUERY_PARAMS.get('patient_id', None)
