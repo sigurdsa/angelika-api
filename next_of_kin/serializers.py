@@ -7,10 +7,8 @@ class NextOfKinSerializer(serializers.ModelSerializer):
         model = NextOfKin
         fields = (
             'id',
-            'first_name',
-            'last_name',
+            'full_name',
             'address',
             'phone_number',
             'relation',
         )
-
