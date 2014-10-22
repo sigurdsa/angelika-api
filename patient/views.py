@@ -28,7 +28,7 @@ class CurrentPatient(APIView):
         patient = request.user.patient
         exclude_fields = []
         if not patient.o2_access:
-            exclude_fields += ['o2_min', 'o2_min']
+            exclude_fields += ['o2_min', 'o2_max']
         if not patient.pulse_access:
             exclude_fields += ['pulse_min', 'pulse_max']
         if not patient.temperature_access:
