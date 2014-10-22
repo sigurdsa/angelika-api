@@ -54,20 +54,18 @@ class PatientListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Patient
-        fields = (
+        fields = [
             'id',
             'user',
             'birth_date',
             'age',
             'national_identification_number',
             'phone_number'
-        )
+        ]
 
 
 class PatientDetailSerializer(PatientListSerializer):
     user = UserSerializer()
-    birth_date = serializers.SerializerMethodField('get_birth_date')
-    age = serializers.SerializerMethodField('get_age')
     next_of_kin = serializers.SerializerMethodField('get_next_of_kin')
 
     def get_next_of_kin(self, obj):
@@ -75,15 +73,8 @@ class PatientDetailSerializer(PatientListSerializer):
         serializer = NextOfKinSerializer(next_of_kin, many=True, context=self.context)
         return serializer.data
 
-    class Meta:
-        model = Patient
-        fields = (
-            'id',
-            'user',
-            'birth_date',
-            'age',
-            'national_identification_number',
-            'phone_number',
+    class Meta(PatientListSerializer.Meta):
+        fields = PatientListSerializer.Meta.fields + [
             'address',
             'zip_code',
             'city',
@@ -98,4 +89,4 @@ class PatientDetailSerializer(PatientListSerializer):
             'pulse_access',
             'o2_access',
             'temperature_access'
-        )
+        ]
