@@ -25,9 +25,16 @@ Create migrations. Do this after you have changed one or more models. Commit the
 `make shell`
 Start the interactive Python shell in your terminal. Here, you can play around with the API Django gives you.
 
-#Contribution guideline
+# Contribution guidelines
 * Commit your changes to a seperate branch
 * "One" feature or bug fix per branch (easier to review)
 * `make migrations` should be the last thing you do before commiting changes done in models
 * Code style: PEP 8
 * Max line length: 100 characters
+
+# User groups
+On /admin/auth/group/ you should have the following groups:
+* admins
+* health-professionals
+* hubs
+* patients

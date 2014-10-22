@@ -90,3 +90,32 @@ class PatientDetailSerializer(PatientListSerializer):
             'o2_access',
             'temperature_access'
         ]
+
+
+class CurrentPatientSerializer(serializers.ModelSerializer):
+    user = SimpleUserSerializer()
+
+    def __init__(self, *args, **kwargs):
+        exclude = kwargs.pop('exclude', None)
+        super(CurrentPatientSerializer, self).__init__(*args, **kwargs)
+        if exclude:
+            # Drop any fields that are specified in the `exclude` argument.
+            for field_name in exclude:
+                self.fields.pop(field_name)
+
+    class Meta:
+        model = Patient
+        fields = [
+            'id',
+            'user',
+            'pulse_max',
+            'pulse_min',
+            'o2_max',
+            'o2_min',
+            'temperature_max',
+            'temperature_min',
+            'activity_access',
+            'pulse_access',
+            'o2_access',
+            'temperature_access'
+        ]
