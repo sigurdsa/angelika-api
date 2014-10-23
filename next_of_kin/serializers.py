@@ -10,5 +10,6 @@ class NextOfKinSerializer(serializers.ModelSerializer):
             'full_name',
             'address',
             'phone_number',
+            'priority',
             'relation',
         )
