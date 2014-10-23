@@ -17,3 +17,7 @@ install:
 .PHONY: shell
 shell:
 	python manage.py shell
+	
+.PHONY: test
+test:
+	python manage.py test
