@@ -11,8 +11,6 @@ router = routers.DefaultRouter()
 router.register(r'alarms', alarm_views.AlarmViewSet)
 router.register(r'patients', patient_views.PatientViewSet, base_name='Patients')
 router.register(r'measurements', measurement_views.MeasurementViewSet, base_name='Measurements')
-router.register(r'motivation_text', motivation_views.MotivationTextViewSet)
-router.register(r'next_of_kin', next_of_kin_views.NextOfKinViewSet)
 
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
