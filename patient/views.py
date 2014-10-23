@@ -22,21 +22,22 @@ class PatientViewSet(viewsets.ModelViewSet):
         kwargs['partial'] = True
         patient_id = kwargs['pk']
 
-        next_of_kin_ids = []
-        for next_of_kin_dict in request.DATA['next_of_kin']:
-            if 'id' in next_of_kin_dict and next_of_kin_dict['id']:
-                next_of_kin_ids.append(next_of_kin_dict['id'])
-                NextOfKin.objects.filter(id=next_of_kin_dict['id']).update(**next_of_kin_dict)
-            else:
-                new_next_of_kin = NextOfKin(patient_id=kwargs['pk'], **next_of_kin_dict)
-                new_next_of_kin.save()
-                next_of_kin_ids.append(new_next_of_kin.id)
+        if 'next_of_kin' in request.DATA:
+            next_of_kin_ids = []
+            for next_of_kin_dict in request.DATA['next_of_kin']:
+                if 'id' in next_of_kin_dict and next_of_kin_dict['id']:
+                    next_of_kin_ids.append(next_of_kin_dict['id'])
+                    NextOfKin.objects.filter(id=next_of_kin_dict['id']).update(**next_of_kin_dict)
+                else:
+                    new_next_of_kin = NextOfKin(patient_id=kwargs['pk'], **next_of_kin_dict)
+                    new_next_of_kin.save()
+                    next_of_kin_ids.append(new_next_of_kin.id)
 
-        num_next_of_kin = NextOfKin.objects.filter(patient__id=patient_id).count()
-        if num_next_of_kin != len(request.DATA['next_of_kin']):
-            for next_of_kin in NextOfKin.objects.filter(patient__id=patient_id):
-                if not next_of_kin.id in next_of_kin_ids:
-                    next_of_kin.delete()
+            num_next_of_kin = NextOfKin.objects.filter(patient__id=patient_id).count()
+            if num_next_of_kin != len(request.DATA['next_of_kin']):
+                for next_of_kin in NextOfKin.objects.filter(patient__id=patient_id):
+                    if not next_of_kin.id in next_of_kin_ids:
+                        next_of_kin.delete()
 
         return self.update(request, *args, **kwargs)
 
