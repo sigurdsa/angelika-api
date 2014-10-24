@@ -4,8 +4,8 @@ from rest_framework import serializers
 import datetime
 from next_of_kin.models import NextOfKin
 from next_of_kin.serializers import NextOfKinSerializer
-from motivation_texts.models import MotivationText
-from motivation_texts.serializers import MotivationTextSerializer
+from motivation_text.models import MotivationText
+from motivation_text.serializers import MotivationTextSerializer
 
 
 class SimpleUserSerializer(serializers.ModelSerializer):

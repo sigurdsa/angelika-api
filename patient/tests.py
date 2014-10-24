@@ -1,7 +1,7 @@
 from test.testcase import AngelikaAPITestCase
 from patient.models import Patient
 from next_of_kin.models import NextOfKin
-from motivation_texts.models import MotivationText
+from motivation_text.models import MotivationText
 
 
 class PermissionTests(AngelikaAPITestCase):
