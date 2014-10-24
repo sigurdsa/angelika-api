@@ -1,6 +1,7 @@
 from test.testcase import AngelikaAPITestCase
 from patient.models import Patient
 from next_of_kin.models import NextOfKin
+from motivation_texts.models import MotivationText
 
 
 class PermissionTests(AngelikaAPITestCase):
@@ -182,3 +183,17 @@ class PatchTests(AngelikaAPITestCase):
         # next of kin 3 is added
         next_of_kin3 = next_of_kin.last()
         self.assertEqual(next_of_kin3.phone_number, '45987543')
+
+    def test_add_motivation_text(self):
+        self.force_authenticate('helselise')
+        first_patient = Patient.objects.all().first()
+        motivation_text = MotivationText(
+            patient = first_patient,
+            time_created = '2014-10-24T09:46:20Z',
+            text = 'HEI'
+        )
+
+        self.assertEqual(motivation_text.text, 'HEI')
+
+
+

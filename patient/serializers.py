@@ -4,8 +4,8 @@ from rest_framework import serializers
 import datetime
 from next_of_kin.models import NextOfKin
 from next_of_kin.serializers import NextOfKinSerializer
-from motivation_text.models import MotivationText
-from motivation_text.serializers import MotivationTextSerializer
+from motivation_texts.models import MotivationText
+from motivation_texts.serializers import MotivationTextSerializer
 
 
 class SimpleUserSerializer(serializers.ModelSerializer):
@@ -69,7 +69,7 @@ class PatientListSerializer(serializers.ModelSerializer):
 class PatientDetailSerializer(PatientListSerializer):
     user = UserSerializer()
     next_of_kin = serializers.SerializerMethodField('get_next_of_kin')
-    motivation_text=serializers.SerializerMethodField('get_motivation_text')
+    motivation_texts=serializers.SerializerMethodField('get_motivation_text')
 
     def get_next_of_kin(self, obj):
         next_of_kin = NextOfKin.objects.filter(patient__id=obj.id)
@@ -77,8 +77,8 @@ class PatientDetailSerializer(PatientListSerializer):
         return serializer.data
 
     def get_motivation_text(self,obj):
-        motivation_text=MotivationText.objects.filter(patient_id=obj.id)
-        serializer = MotivationTextSerializer(motivation_text, many=True, context=self.context)
+        motivation_texts = MotivationText.objects.filter(patient__id=obj.id)
+        serializer = MotivationTextSerializer(motivation_texts, many=True, context=self.context)
         return serializer.data
 
     class Meta(PatientListSerializer.Meta):
@@ -87,7 +87,7 @@ class PatientDetailSerializer(PatientListSerializer):
             'zip_code',
             'city',
             'next_of_kin',
-            'motivation_text',
+            'motivation_texts',
             'pulse_max',
             'pulse_min',
             'o2_max',

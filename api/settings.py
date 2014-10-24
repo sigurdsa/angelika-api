@@ -42,7 +42,7 @@ INSTALLED_APPS = (
     'alarm',
     'patient',
     'measurement',
-    'motivation_text',
+    'motivation_texts',
     'next_of_kin',
 )
 
