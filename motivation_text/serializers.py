@@ -6,3 +6,4 @@ class MotivationTextSerializer(serializers.ModelSerializer):
     class Meta:
         model = MotivationText
         fields = ('id', 'time_created', 'text')
+        read_only_fields = ('time_created',)

@@ -246,7 +246,6 @@ class PatchTests(AngelikaAPITestCase):
                 'motivation_texts': [
                     {
                         'id': None,
-                        'time_created': '2014-10-24T09:46:20Z',
                         'text': 'HEI'
                     }
                 ]
@@ -287,6 +286,9 @@ class PatchTests(AngelikaAPITestCase):
         self.assertEqual(len(motivation_text), 1)
         motivation_text = motivation_text.first()
         self.assertEqual(motivation_text.text, 'LOL')
+
+        # time_created should not be updated as it is read only
+        self.assertNotEqual("%s" % motivation_text.time_created, '2014-10-24 09:46:20+00:00')
 
     def test_remove_motivation_text(self):
         self.force_authenticate('helselise')

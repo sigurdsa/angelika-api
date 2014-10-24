@@ -45,6 +45,8 @@ class PatientViewSet(viewsets.ModelViewSet):
         if 'motivation_texts' in request.DATA:
             motivation_text_ids=[]
             for motivation_text_dict in request.DATA['motivation_texts']:
+                if 'time_created' in motivation_text_dict:
+                    del motivation_text_dict['time_created']
                 if 'id' in motivation_text_dict and motivation_text_dict['id']:
                     motivation_text_ids.append(motivation_text_dict['id'])
                     MotivationText.objects.filter(id=motivation_text_dict['id']).update(**motivation_text_dict)
