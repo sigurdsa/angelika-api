@@ -24,14 +24,16 @@ class PatientViewSet(viewsets.ModelViewSet):
 
         if 'next_of_kin' in request.DATA:
             next_of_kin_ids = []
+            i = 0
             for next_of_kin_dict in request.DATA['next_of_kin']:
                 if 'id' in next_of_kin_dict and next_of_kin_dict['id']:
                     next_of_kin_ids.append(next_of_kin_dict['id'])
-                    NextOfKin.objects.filter(id=next_of_kin_dict['id']).update(**next_of_kin_dict)
+                    NextOfKin.objects.filter(id=next_of_kin_dict['id']).update(priority=i, **next_of_kin_dict)
                 else:
-                    new_next_of_kin = NextOfKin(patient_id=kwargs['pk'], **next_of_kin_dict)
+                    new_next_of_kin = NextOfKin(patient_id=kwargs['pk'], priority=i, **next_of_kin_dict)
                     new_next_of_kin.save()
                     next_of_kin_ids.append(new_next_of_kin.id)
+                i += 1
 
             num_next_of_kin = NextOfKin.objects.filter(patient__id=patient_id).count()
             if num_next_of_kin != len(request.DATA['next_of_kin']):
