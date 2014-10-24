@@ -236,16 +236,76 @@ class PatchTests(AngelikaAPITestCase):
         next_of_kin3 = next_of_kin.last()
         self.assertEqual(next_of_kin3.phone_number, '34780943')
 
-
-class StructureTest(AngelikaAPITestCase):
     def test_add_motivation_text(self):
+        self.force_authenticate('helselise')
         first_patient = Patient.objects.all().first()
-        MotivationText.objects.create(
-            patient=first_patient,
-            time_created='2014-10-24T09:46:20Z',
-            text='HEI'
+
+        response = self.client.patch(
+            '/patients/' + str(first_patient.id) + '/',
+            {
+                'motivation_texts': [
+                    {
+                        'id': None,
+                        'time_created': '2014-10-24T09:46:20Z',
+                        'text': 'HEI'
+                    }
+                ]
+            },
+            format='json'
         )
+
         motivation_text = MotivationText.objects.filter(patient=first_patient)
         self.assertEqual(len(motivation_text), 1)
         motivation_text = motivation_text.first()
         self.assertEqual(motivation_text.text, 'HEI')
+
+    def test_update_motivation_text(self):
+        self.force_authenticate('helselise')
+        first_patient = Patient.objects.all().first()
+
+        motivation_text = MotivationText.objects.create(
+            patient=first_patient,
+            text='HEI',
+            time_created='2014-10-24T09:46:20Z'
+        )
+
+        response = self.client.patch(
+            '/patients/' + str(first_patient.id) + '/',
+            {
+                'motivation_texts': [
+                    {
+                        'id': 1,
+                        'time_created': '2014-10-24T09:46:20Z',
+                        'text': 'LOL'
+                    }
+                ]
+            },
+            format='json'
+        )
+
+        motivation_text = MotivationText.objects.filter(patient=first_patient)
+        self.assertEqual(len(motivation_text), 1)
+        motivation_text = motivation_text.first()
+        self.assertEqual(motivation_text.text, 'LOL')
+
+    def test_remove_motivation_text(self):
+        self.force_authenticate('helselise')
+        first_patient = Patient.objects.all().first()
+
+        motivation_text = MotivationText.objects.create(
+         patient=first_patient,
+            text='HEI',
+            time_created='2014-10-24T09:46:20Z'
+        )
+
+
+        response = self.client.patch(
+            '/patients/' + str(first_patient.id) + '/',
+            {
+                'motivation_texts': []
+            },
+            format='json'
+        )
+
+        motivation_text = MotivationText.objects.filter(patient=first_patient)
+        self.assertEqual(len(motivation_text), 0)
