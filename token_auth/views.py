@@ -10,16 +10,19 @@ class CustomObtainAuthToken(ObtainAuthToken):
         serializer = self.serializer_class(data=request.DATA)
         if serializer.is_valid():
             user = serializer.object['user']
-            patient = None
-            try:
-                patient = Patient.objects.get(user__id=user.id)
-            except Patient.DoesNotExist:
-                pass
+
+            group = None
+            if user.groups.filter(name='health-professionals').exists():
+                group = 'health-professionals'
+            elif user.groups.filter(name='patients').exists():
+                group = 'patients'
+            elif user.groups.filter(name='hubs').exists():
+                group = 'hubs'
 
             token, created = Token.objects.get_or_create(user=user)
 
-            role = 'patient' if patient else 'health-professional'
-            return Response({'token': token.key, 'role': role})
+            return Response({'token': token.key, 'group': group})
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 custom_obtain_auth_token = CustomObtainAuthToken.as_view()
