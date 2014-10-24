@@ -309,5 +309,4 @@ class PatchTests(AngelikaAPITestCase):
             format='json'
         )
 
-        motivation_text = MotivationText.objects.filter(patient=first_patient)
-        self.assertEqual(len(motivation_text), 0)
+        self.assertEqual(MotivationText.objects.filter(patient=first_patient).count(), 0)
