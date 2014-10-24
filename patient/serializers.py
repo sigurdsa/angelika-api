@@ -67,6 +67,7 @@ class PatientListSerializer(serializers.ModelSerializer):
 class PatientDetailSerializer(PatientListSerializer):
     user = UserSerializer()
     next_of_kin = serializers.SerializerMethodField('get_next_of_kin')
+    
 
     def get_next_of_kin(self, obj):
         next_of_kin = NextOfKin.objects.filter(patient__id=obj.id)
