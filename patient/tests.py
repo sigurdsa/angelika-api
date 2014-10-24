@@ -240,9 +240,9 @@ class PatchTests(AngelikaAPITestCase):
         self.force_authenticate('helselise')
         first_patient = Patient.objects.all().first()
         motivation_text = MotivationText(
-            patient = first_patient,
-            time_created = '2014-10-24T09:46:20Z',
-            text = 'HEI'
+            patient=first_patient,
+            time_created='2014-10-24T09:46:20Z',
+            text='HEI'
         )
 
         self.assertEqual(motivation_text.text, 'HEI')

@@ -69,14 +69,14 @@ class PatientListSerializer(serializers.ModelSerializer):
 class PatientDetailSerializer(PatientListSerializer):
     user = UserSerializer()
     next_of_kin = serializers.SerializerMethodField('get_next_of_kin')
-    motivation_texts=serializers.SerializerMethodField('get_motivation_text')
+    motivation_texts=serializers.SerializerMethodField('get_motivation_texts')
 
     def get_next_of_kin(self, obj):
         next_of_kin = NextOfKin.objects.filter(patient__id=obj.id)
         serializer = NextOfKinSerializer(next_of_kin, many=True, context=self.context)
         return serializer.data
 
-    def get_motivation_text(self,obj):
+    def get_motivation_texts(self,obj):
         motivation_texts = MotivationText.objects.filter(patient__id=obj.id)
         serializer = MotivationTextSerializer(motivation_texts, many=True, context=self.context)
         return serializer.data
