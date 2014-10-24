@@ -19,4 +19,5 @@ urlpatterns = patterns('',
     url(r'^api-token-auth/', 'token_auth.views.custom_obtain_auth_token'),
     url(r'^current-patient/', patient_views.CurrentPatient.as_view()),
     url(r'^current-patient-measurements/', measurement_views.CurrentPatientMeasurements.as_view()),
+    url(r'^post-measurements/', measurement_views.PostMeasurements.as_view()),
 )

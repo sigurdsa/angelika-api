@@ -20,9 +20,28 @@ class Measurement(models.Model):
     ]
     type = models.CharField(max_length=1, choices=TYPES, null=False)
 
+    BPM = 'B'
+    PERCENT = 'E'
+    STEPS = 'S'
+    METERS = 'M'
+    KCAL = 'K'
+    SECONDS = 'C'
+    NONE = ''
+    UNITS = [
+        (BPM, 'BPM'),
+        (PERCENT, '%'),
+        (STEPS, 'Steps'),
+        (METERS, 'Meters'),
+        (KCAL, 'KCal'),
+        (SECONDS,'Seconds'),
+        (NONE, '')
+    ]
+    unit = models.CharField(max_length=1, choices=UNITS, null=False, default=NONE)
+
+
     def __unicode__(self):
         return smart_unicode(
-            self.type + " = " + str(self.value) + " @ " + str(self.time) + " for " + self.patient.user.first_name
+            self.type + " = " + str(self.value) + " " + self.unit + " @ " + str(self.time) + " for " + self.patient.user.first_name
             + " " + self.patient.user.last_name
         )
 
