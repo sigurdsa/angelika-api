@@ -1,3 +1,4 @@
 django==1.7
 djangorestframework==2.4.2
 django-cors-headers==0.13
+pytz==2014.7
