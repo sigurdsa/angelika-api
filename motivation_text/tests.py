@@ -6,7 +6,6 @@ from test.testcase import AngelikaAPITestCase
 
 class TestMotivation(AngelikaAPITestCase):
     def test_add_motivation_text(self):
-        self.force_authenticate('helselise')
         first_patient = Patient.objects.all().first()
         motivation_text = MotivationText(
             patient=first_patient,

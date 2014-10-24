@@ -239,7 +239,6 @@ class PatchTests(AngelikaAPITestCase):
 
 class StructureTest(AngelikaAPITestCase):
     def test_add_motivation_text(self):
-        self.force_authenticate('helselise')
         first_patient = Patient.objects.all().first()
         MotivationText.objects.create(
             patient=first_patient,
