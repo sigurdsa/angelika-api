@@ -69,7 +69,8 @@ class PatientListSerializer(serializers.ModelSerializer):
 class PatientDetailSerializer(PatientListSerializer):
     user = UserSerializer()
     next_of_kin = serializers.SerializerMethodField('get_next_of_kin')
-    motivation_texts=serializers.SerializerMethodField('get_motivation_texts')
+    motivation_texts = serializers.SerializerMethodField('get_motivation_texts')
+    information_texts = serializers.SerializerMethodField('get_information_texts')
 
     def get_next_of_kin(self, obj):
         next_of_kin = NextOfKin.objects.filter(patient__id=obj.id)
@@ -77,8 +78,13 @@ class PatientDetailSerializer(PatientListSerializer):
         return serializer.data
 
     def get_motivation_texts(self,obj):
-        motivation_texts = MotivationText.objects.filter(patient__id=obj.id)
+        motivation_texts = MotivationText.objects.filter(patient__id=obj.id, type='M')
         serializer = MotivationTextSerializer(motivation_texts, many=True, context=self.context)
+        return serializer.data
+
+    def get_information_texts(self,obj):
+        information_texts = MotivationText.objects.filter(patient__id=obj.id, type='I')
+        serializer = MotivationTextSerializer(information_texts, many=True, context=self.context)
         return serializer.data
 
     class Meta(PatientListSerializer.Meta):
@@ -88,6 +94,7 @@ class PatientDetailSerializer(PatientListSerializer):
             'city',
             'next_of_kin',
             'motivation_texts',
+            'information_texts',
             'pulse_max',
             'pulse_min',
             'o2_max',
