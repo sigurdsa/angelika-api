@@ -29,9 +29,11 @@ class PatientViewSet(viewsets.ModelViewSet):
             for next_of_kin_dict in request.DATA['next_of_kin']:
                 if 'id' in next_of_kin_dict and next_of_kin_dict['id']:
                     next_of_kin_ids.append(next_of_kin_dict['id'])
-                    NextOfKin.objects.filter(id=next_of_kin_dict['id']).update(priority=i, **next_of_kin_dict)
+                    NextOfKin.objects.filter(id=next_of_kin_dict['id']).update(
+                        priority=i, **next_of_kin_dict)
                 else:
-                    new_next_of_kin = NextOfKin(patient_id=kwargs['pk'], priority=i, **next_of_kin_dict)
+                    new_next_of_kin = NextOfKin(patient_id=kwargs['pk'],
+                                                priority=i, **next_of_kin_dict)
                     new_next_of_kin.save()
                     next_of_kin_ids.append(new_next_of_kin.id)
                 i += 1
@@ -49,17 +51,44 @@ class PatientViewSet(viewsets.ModelViewSet):
                     del motivation_text_dict['time_created']
                 if 'id' in motivation_text_dict and motivation_text_dict['id']:
                     motivation_text_ids.append(motivation_text_dict['id'])
-                    MotivationText.objects.filter(id=motivation_text_dict['id']).update(**motivation_text_dict)
+                    MotivationText.objects.filter(id=motivation_text_dict['id']).update(
+                        **motivation_text_dict)
                 else:
-                    new_motivation_text = MotivationText(patient_id=kwargs['pk'], **motivation_text_dict)
+                    new_motivation_text = MotivationText(type='M', patient_id=kwargs['pk'],
+                                                         **motivation_text_dict)
                     new_motivation_text.save()
                     motivation_text_ids.append(new_motivation_text.id)
 
-            num_motivation_text = MotivationText.objects.filter(patient__id=patient_id).count()
+            num_motivation_text = MotivationText.objects.filter(
+                patient__id=patient_id, type='M').count()
             if num_motivation_text != len(request.DATA['motivation_texts']):
-                for motivation_text in MotivationText.objects.filter(patient__id=patient_id):
+                for motivation_text in MotivationText.objects.filter(
+                        patient__id=patient_id, type='M'):
                     if not motivation_text.id in motivation_text_ids:
                         motivation_text.delete()
+
+        if 'information_texts' in request.DATA:
+            information_text_ids = []
+            for information_text_dict in request.DATA['information_texts']:
+                if 'time_created' in information_text_dict:
+                    del information_text_dict['time_created']
+                if 'id' in information_text_dict and information_text_dict['id']:
+                    information_text_ids.append(information_text_dict['id'])
+                    MotivationText.objects.filter(id=information_text_dict['id']).update(
+                        **information_text_dict)
+                else:
+                    new_information_text = MotivationText(type='I', patient_id=kwargs['pk'],
+                                                          **information_text_dict)
+                    new_information_text.save()
+                    information_text_ids.append(new_information_text.id)
+
+            num_information_text = MotivationText.objects.filter(
+                patient__id=patient_id, type='I').count()
+            if num_information_text != len(request.DATA['information_texts']):
+                for information_text in MotivationText.objects.filter(
+                        patient__id=patient_id, type='I'):
+                    if not information_text.id in information_text_ids:
+                        information_text.delete()
 
         return self.update(request, *args, **kwargs)
 
