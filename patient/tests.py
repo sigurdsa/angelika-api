@@ -246,7 +246,6 @@ class PatchTests(AngelikaAPITestCase):
                 'motivation_texts': [
                     {
                         'id': None,
-                        'time_created': '2014-10-24T09:46:20Z',
                         'text': 'HEI'
                     }
                 ]
@@ -288,6 +287,9 @@ class PatchTests(AngelikaAPITestCase):
         motivation_text = motivation_text.first()
         self.assertEqual(motivation_text.text, 'LOL')
 
+        # time_created should not be updated as it is read only
+        self.assertNotEqual("%s" % motivation_text.time_created, '2014-10-24 09:46:20+00:00')
+
     def test_remove_motivation_text(self):
         self.force_authenticate('helselise')
         first_patient = Patient.objects.all().first()
@@ -307,5 +309,4 @@ class PatchTests(AngelikaAPITestCase):
             format='json'
         )
 
-        motivation_text = MotivationText.objects.filter(patient=first_patient)
-        self.assertEqual(len(motivation_text), 0)
+        self.assertEqual(MotivationText.objects.filter(patient=first_patient).count(), 0)
