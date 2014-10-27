@@ -1,4 +1,3 @@
-from django.test import TestCase
 from motivation_text.models import MotivationText
 from patient.models import Patient
 from test.testcase import AngelikaAPITestCase
