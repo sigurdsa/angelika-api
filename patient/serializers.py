@@ -13,7 +13,7 @@ class SimpleUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['full_name',]
+        fields = ['full_name', ]
 
     def get_full_name(self, obj):
         return obj.get_full_name()
@@ -77,12 +77,12 @@ class PatientDetailSerializer(PatientListSerializer):
         serializer = NextOfKinSerializer(next_of_kin, many=True, context=self.context)
         return serializer.data
 
-    def get_motivation_texts(self,obj):
+    def get_motivation_texts(self, obj):
         motivation_texts = MotivationText.objects.filter(patient__id=obj.id, type='M')
         serializer = MotivationTextSerializer(motivation_texts, many=True, context=self.context)
         return serializer.data
 
-    def get_information_texts(self,obj):
+    def get_information_texts(self, obj):
         information_texts = MotivationText.objects.filter(patient__id=obj.id, type='I')
         serializer = MotivationTextSerializer(information_texts, many=True, context=self.context)
         return serializer.data

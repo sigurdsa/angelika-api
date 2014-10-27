@@ -82,13 +82,13 @@ class PatientViewSet(viewsets.ModelViewSet):
                     new_information_text.save()
                     information_text_ids.append(new_information_text.id)
 
-                num_information_text = MotivationText.objects.filter(
-                    patient__id=patient_id, type='I').count()
-                if num_information_text != len(request.DATA['information_texts']):
-                    for information_text in MotivationText.objects.filter(
-                            patient__id=patient_id, type='I'):
-                        if not information_text.id in information_text_ids:
-                            information_text.delete()
+            num_information_text = MotivationText.objects.filter(
+                patient__id=patient_id, type='I').count()
+            if num_information_text != len(request.DATA['information_texts']):
+                for information_text in MotivationText.objects.filter(
+                        patient__id=patient_id, type='I'):
+                    if not information_text.id in information_text_ids:
+                        information_text.delete()
 
         return self.update(request, *args, **kwargs)
 

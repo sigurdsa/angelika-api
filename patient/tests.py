@@ -40,7 +40,7 @@ class PatchTests(AngelikaAPITestCase):
         self.force_authenticate('helselise')
         first_patient = Patient.objects.all().first()
 
-        response = self.client.patch(
+        self.client.patch(
             '/patients/' + str(first_patient.id) + '/',
             {
                 'next_of_kin': [
@@ -74,7 +74,7 @@ class PatchTests(AngelikaAPITestCase):
             relation='Datter'
         )
 
-        response = self.client.patch(
+        self.client.patch(
             '/patients/' + str(first_patient.id) + '/',
             {
                 'next_of_kin': [
@@ -117,7 +117,7 @@ class PatchTests(AngelikaAPITestCase):
             relation='Datter'
         )
 
-        response = self.client.patch(
+        self.client.patch(
             '/patients/' + str(first_patient.id) + '/',
             {
                 'next_of_kin': [
@@ -152,12 +152,11 @@ class PatchTests(AngelikaAPITestCase):
         next_of_kin2 = next_of_kin.last()
         self.assertEqual(next_of_kin2.full_name, 'Marit Ulstein')
 
-
     def test_remove_next_of_kin_address(self):
         self.force_authenticate('helselise')
         first_patient = Patient.objects.all().first()
 
-        next_of_kin = NextOfKin.objects.create(
+        NextOfKin.objects.create(
             patient=first_patient,
             full_name='Marit Ulstein',
             address='Gjengeskvulpet 4',
@@ -166,7 +165,7 @@ class PatchTests(AngelikaAPITestCase):
             relation='Datter'
         )
 
-        response = self.client.patch(
+        self.client.patch(
             '/patients/' + str(first_patient.id) + '/',
             {
                 'next_of_kin': []
@@ -199,7 +198,7 @@ class PatchTests(AngelikaAPITestCase):
             relation='Datter'
         )
 
-        response = self.client.patch(
+        self.client.patch(
             '/patients/' + str(first_patient.id) + '/',
             {
                 'next_of_kin': [
@@ -240,7 +239,7 @@ class PatchTests(AngelikaAPITestCase):
         self.force_authenticate('helselise')
         first_patient = Patient.objects.all().first()
 
-        response = self.client.patch(
+        self.client.patch(
             '/patients/' + str(first_patient.id) + '/',
             {
                 'motivation_texts': [
@@ -253,7 +252,7 @@ class PatchTests(AngelikaAPITestCase):
             format='json'
         )
 
-        motivation_text = MotivationText.objects.filter(patient=first_patient)
+        motivation_text = MotivationText.objects.filter(type='M', patient=first_patient)
         self.assertEqual(len(motivation_text), 1)
         motivation_text = motivation_text.first()
         self.assertEqual(motivation_text.text, 'HEI')
@@ -268,7 +267,7 @@ class PatchTests(AngelikaAPITestCase):
             time_created='2014-10-24T09:46:20Z'
         )
 
-        response = self.client.patch(
+        self.client.patch(
             '/patients/' + str(first_patient.id) + '/',
             {
                 'motivation_texts': [
@@ -282,7 +281,7 @@ class PatchTests(AngelikaAPITestCase):
             format='json'
         )
 
-        motivation_texts = MotivationText.objects.filter(patient=first_patient)
+        motivation_texts = MotivationText.objects.filter(type='M', patient=first_patient)
         self.assertEqual(len(motivation_texts), 1)
         motivation_text = motivation_texts.first()
         self.assertEqual(motivation_text.text, 'LOL')
@@ -294,14 +293,14 @@ class PatchTests(AngelikaAPITestCase):
         self.force_authenticate('helselise')
         first_patient = Patient.objects.all().first()
 
-        motivation_text = MotivationText.objects.create(
-         patient=first_patient,
+        MotivationText.objects.create(
+            patient=first_patient,
             text='HEI',
-            time_created='2014-10-24T09:46:20Z'
+            time_created='2014-10-24T09:46:20Z',
+            type='M'
         )
 
-
-        response = self.client.patch(
+        self.client.patch(
             '/patients/' + str(first_patient.id) + '/',
             {
                 'motivation_texts': []
@@ -309,4 +308,112 @@ class PatchTests(AngelikaAPITestCase):
             format='json'
         )
 
-        self.assertEqual(MotivationText.objects.filter(patient=first_patient).count(), 0)
+        self.assertEqual(MotivationText.objects.filter(type='M', patient=first_patient).count(), 0)
+
+    def test_add_information_text(self):
+        self.force_authenticate('helselise')
+        first_patient = Patient.objects.all().first()
+
+        self.client.patch(
+            '/patients/' + str(first_patient.id) + '/',
+            {
+                'information_texts': [
+                    {
+                        'id': None,
+                        'text': 'HEI'
+                    }
+                ]
+            },
+            format='json'
+        )
+
+        information_text = MotivationText.objects.filter(type='I', patient=first_patient)
+        self.assertEqual(len(information_text), 1)
+        information_text = information_text.first()
+        self.assertEqual(information_text.text, 'HEI')
+
+    def test_update_information_text(self):
+        self.force_authenticate('helselise')
+        first_patient = Patient.objects.all().first()
+
+        information_text = MotivationText.objects.create(
+            patient=first_patient,
+            text='HEI',
+            time_created='2014-10-24T09:46:20Z',
+            type='I'
+        )
+
+        self.client.patch(
+            '/patients/' + str(first_patient.id) + '/',
+            {
+                'information_texts': [
+                    {
+                        'id': information_text.id,
+                        'time_created': '2014-10-24T09:46:20Z',
+                        'text': 'LOL'
+                    }
+                ]
+            },
+            format='json'
+        )
+
+        information_texts = MotivationText.objects.filter(type='I', patient=first_patient)
+        self.assertEqual(len(information_texts), 1)
+        information_text = information_texts.first()
+        self.assertEqual(information_text.text, 'LOL')
+
+        # time_created should not be updated as it is read only
+        self.assertNotEqual("%s" % information_text.time_created, '2014-10-24 09:46:20+00:00')
+
+    def test_remove_information_text(self):
+        self.force_authenticate('helselise')
+        first_patient = Patient.objects.all().first()
+
+        MotivationText.objects.create(
+            patient=first_patient,
+            text='HEI',
+            time_created='2014-10-24T09:46:20Z',
+            type='I'
+        )
+
+        self.client.patch(
+            '/patients/' + str(first_patient.id) + '/',
+            {
+                'information_texts': []
+            },
+            format='json'
+        )
+
+        self.assertEqual(MotivationText.objects.filter(type='I', patient=first_patient).count(), 0)
+
+    def test_add_information_and_motivation_text(self):
+        self.force_authenticate('helselise')
+        first_patient = Patient.objects.all().first()
+
+        self.client.patch(
+            '/patients/' + str(first_patient.id) + '/',
+            {
+                'information_texts': [
+                    {
+                        'id': None,
+                        'text': 'HEI'
+                    }
+                ],
+                'motivation_texts': [
+                    {
+                        'id': None,
+                        'text': 'HEI'
+                    }
+                ]
+            },
+            format='json'
+        )
+
+        information_text = MotivationText.objects.filter(type='I', patient=first_patient)
+        self.assertEqual(len(information_text), 1)
+        information_text = information_text.first()
+        self.assertEqual(information_text.text, 'HEI')
+        motivation_text = MotivationText.objects.filter(type='M', patient=first_patient)
+        self.assertEqual(len(motivation_text), 1)
+        motivation_text = motivation_text.first()
+        self.assertEqual(motivation_text.text, 'HEI')
