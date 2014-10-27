@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from api.permissions import IsHealthProfessional, IsPatient
 from rest_framework.permissions import IsAuthenticated
 from next_of_kin.models import NextOfKin
+from motivation_text.models import MotivationText
 
 
 class PatientViewSet(viewsets.ModelViewSet):
@@ -40,6 +41,25 @@ class PatientViewSet(viewsets.ModelViewSet):
                 for next_of_kin in NextOfKin.objects.filter(patient__id=patient_id):
                     if not next_of_kin.id in next_of_kin_ids:
                         next_of_kin.delete()
+
+        if 'motivation_texts' in request.DATA:
+            motivation_text_ids = []
+            for motivation_text_dict in request.DATA['motivation_texts']:
+                if 'time_created' in motivation_text_dict:
+                    del motivation_text_dict['time_created']
+                if 'id' in motivation_text_dict and motivation_text_dict['id']:
+                    motivation_text_ids.append(motivation_text_dict['id'])
+                    MotivationText.objects.filter(id=motivation_text_dict['id']).update(**motivation_text_dict)
+                else:
+                    new_motivation_text = MotivationText(patient_id=kwargs['pk'], **motivation_text_dict)
+                    new_motivation_text.save()
+                    motivation_text_ids.append(new_motivation_text.id)
+
+            num_motivation_text = MotivationText.objects.filter(patient__id=patient_id).count()
+            if num_motivation_text != len(request.DATA['motivation_texts']):
+                for motivation_text in MotivationText.objects.filter(patient__id=patient_id):
+                    if not motivation_text.id in motivation_text_ids:
+                        motivation_text.delete()
 
         return self.update(request, *args, **kwargs)
 
