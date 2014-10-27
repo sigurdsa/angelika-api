@@ -273,7 +273,7 @@ class PatchTests(AngelikaAPITestCase):
             {
                 'motivation_texts': [
                     {
-                        'id': 1,
+                        'id': motivation_text.id,
                         'time_created': '2014-10-24T09:46:20Z',
                         'text': 'LOL'
                     }
@@ -282,9 +282,9 @@ class PatchTests(AngelikaAPITestCase):
             format='json'
         )
 
-        motivation_text = MotivationText.objects.filter(patient=first_patient)
-        self.assertEqual(len(motivation_text), 1)
-        motivation_text = motivation_text.first()
+        motivation_texts = MotivationText.objects.filter(patient=first_patient)
+        self.assertEqual(len(motivation_texts), 1)
+        motivation_text = motivation_texts.first()
         self.assertEqual(motivation_text.text, 'LOL')
 
         # time_created should not be updated as it is read only
