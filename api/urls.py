@@ -17,6 +17,7 @@ urlpatterns = patterns('',
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api-token-auth/', 'token_auth.views.custom_obtain_auth_token'),
+    url(r'^current-patient/call_me/', patient_views.CurrentPatientCallMeRequest.as_view()),
+    url(r'^current-patient/measurements/', measurement_views.CurrentPatientMeasurements.as_view()),
     url(r'^current-patient/', patient_views.CurrentPatient.as_view()),
-    url(r'^current-patient-measurements/', measurement_views.CurrentPatientMeasurements.as_view()),
 )

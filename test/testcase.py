@@ -41,3 +41,4 @@ class AngelikaAPITestCase(APITestCase):
     def force_authenticate(self, username):
         user = User.objects.get(username=username)
         self.client.force_authenticate(user=user)
+        return user

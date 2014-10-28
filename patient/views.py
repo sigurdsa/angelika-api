@@ -7,6 +7,10 @@ from api.permissions import IsHealthProfessional, IsPatient
 from rest_framework.permissions import IsAuthenticated
 from next_of_kin.models import NextOfKin
 from motivation_text.models import MotivationText
+from measurement.models import Measurement
+from alarm.models import Alarm
+from django.utils import timezone
+from datetime import timedelta
 
 
 class PatientViewSet(viewsets.ModelViewSet):
@@ -110,3 +114,32 @@ class CurrentPatient(APIView):
             exclude_fields += ['temperature_min', 'temperature_max']
         serializer = CurrentPatientSerializer(instance=patient, exclude=exclude_fields)
         return Response(serializer.data)
+
+
+class CurrentPatientCallMeRequest(APIView):
+    permission_classes = (IsAuthenticated, IsPatient,)
+
+    def post(self, request, format=None):
+        current_patient = self.request.user.patient
+
+        num_already_requested = Measurement.objects.filter(
+            patient=current_patient,
+            type='C',  # CALL_ME_REQUEST
+            time__gt=timezone.now() - timedelta(hours=1)
+        ).count()
+
+        if num_already_requested >= 1:
+            return Response({'status': 'already_requested'})
+
+        call_me_measurement = Measurement.objects.create(
+            patient=current_patient,
+            type='C',  # CALL_ME_REQUEST
+            time=timezone.now()
+        )
+
+        Alarm.objects.create(
+            measurement=call_me_measurement,
+            time_created=call_me_measurement.time,
+        )
+
+        return Response({'status': 'ok'})

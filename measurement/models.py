@@ -9,11 +9,13 @@ class Measurement(models.Model):
     time = models.DateTimeField(null=False)
 
     ACTIVITY = 'A'
+    CALL_ME_REQUEST = 'C'
     O2 = 'O'
     PULSE = 'P'
     TEMPERATURE = 'T'
     TYPES = [
         (ACTIVITY, 'Activity'),
+        (CALL_ME_REQUEST, 'Call me request'),
         (O2, 'O2'),
         (PULSE, 'Pulse'),
         (TEMPERATURE, 'Temperature')
