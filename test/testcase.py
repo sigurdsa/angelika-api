@@ -7,17 +7,20 @@ class AngelikaAPITestCase(APITestCase):
 
     def setUp(self):
         health_professional_group = Group.objects.create(name='health-professionals')
-        patient_group = Group.objects.create(name='patients')
+        Group.objects.create(name='patients')
 
         health_professional_user = User.objects.create_user('helselise', 'lise@angelika.no', 'test')
         health_professional_user.save()
         health_professional_user.groups.add(health_professional_group)
 
-        patient_user = User.objects.create_user('larsoverhaug', 'larsoverhaug@hotmail.com', 'test')
-        patient_user.first_name = "Lars"
-        patient_user.last_name = "Overhaug"
+        self.create_patient('larsoverhaug', 'Lars', 'Overhaug')
+
+    def create_patient(self, username, first_name, last_name):
+        patient_user = User.objects.create_user(username, username + '@hotmail.com', 'test')
+        patient_user.first_name = first_name
+        patient_user.last_name = last_name
         patient_user.save()
-        patient_user.groups.add(patient_group)
+        patient_user.groups.add(Group.objects.get(name='patients'))
         patient = Patient.objects.create(
             hub_id='hub-trd-1',
             user=patient_user,
@@ -37,6 +40,8 @@ class AngelikaAPITestCase(APITestCase):
             o2_access=False,
             temperature_access=False
         )
+
+        return patient
 
     def force_authenticate(self, username):
         user = User.objects.get(username=username)
