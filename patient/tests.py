@@ -2,6 +2,8 @@ from test.testcase import AngelikaAPITestCase
 from patient.models import Patient
 from next_of_kin.models import NextOfKin
 from motivation_text.models import MotivationText
+from measurement.models import Measurement
+from alarm.models import Alarm
 
 
 class PermissionTests(AngelikaAPITestCase):
@@ -417,3 +419,34 @@ class PatchTests(AngelikaAPITestCase):
         self.assertEqual(len(motivation_text), 1)
         motivation_text = motivation_text.first()
         self.assertEqual(motivation_text.text, 'HEI')
+
+
+class CurrentPatientTests(AngelikaAPITestCase):
+    def test_call_me_request(self):
+        user = self.force_authenticate('larsoverhaug')
+        response = self.client.post('/current-patient/call_me/', {}, format='json')
+        self.assertEqual(response.data['status'], 'ok')
+
+        num_measurements = Measurement.objects.filter(
+            patient=user.patient,
+            type='C',  # CALL_ME_REQUEST
+        ).count()
+        num_alarms = Alarm.objects.filter(
+            measurement__patient=user.patient,
+            measurement__type='C',  # CALL_ME_REQUEST
+        ).count()
+        self.assertEqual(num_measurements, 1)
+        self.assertEqual(num_alarms, 1)
+
+    def test_call_me_request_repeatedly(self):
+        user = self.force_authenticate('larsoverhaug')
+        response = self.client.post('/current-patient/call_me/', {}, format='json')
+        self.assertEqual(response.data['status'], 'ok')
+        response = self.client.post('/current-patient/call_me/', {}, format='json')
+        self.assertEqual(response.data['status'], 'already_requested')
+
+        num_requested = Measurement.objects.filter(
+            patient=user.patient,
+            type='C',  # CALL_ME_REQUEST
+        ).count()
+        self.assertEqual(num_requested, 1)
