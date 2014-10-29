@@ -11,6 +11,9 @@ from measurement.models import Measurement
 from alarm.models import Alarm
 from django.utils import timezone
 from datetime import timedelta
+from rest_framework.decorators import detail_route
+from rest_framework.exceptions import ParseError
+from measurement.serializers import MeasurementGraphSerializer
 
 
 class PatientViewSet(viewsets.ModelViewSet):
@@ -95,6 +98,18 @@ class PatientViewSet(viewsets.ModelViewSet):
                         information_text.delete()
 
         return self.update(request, *args, **kwargs)
+
+    @detail_route()
+    def graph_data(self, request, pk=None):
+        type = self.request.QUERY_PARAMS.get('type', None)
+        if type is None:
+            raise ParseError(detail="Query string 'type' is not specified")
+        if not type in ['A', 'O', 'P', 'T']:
+            raise ParseError(detail="type must be one of the following values: 'A', 'O', 'P', 'T'")
+
+        queryset = Measurement.objects.filter(patient=self.get_object(), type=type)
+        serializer = MeasurementGraphSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class CurrentPatient(APIView):

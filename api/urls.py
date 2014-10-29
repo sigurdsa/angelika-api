@@ -10,7 +10,6 @@ from next_of_kin import views as next_of_kin_views
 router = routers.DefaultRouter()
 router.register(r'alarms', alarm_views.AlarmViewSet, base_name='Alarms')
 router.register(r'patients', patient_views.PatientViewSet, base_name='Patients')
-router.register(r'measurements', measurement_views.MeasurementViewSet, base_name='Measurements')
 
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),

@@ -421,6 +421,14 @@ class PatchTests(AngelikaAPITestCase):
         self.assertEqual(motivation_text.text, 'HEI')
 
 
+class GetTests(AngelikaAPITestCase):
+    def test_graph_data(self):
+        self.force_authenticate('helselise')
+        response = self.client.get('/patients/1/graph_data/?type=O')
+        self.assertEqual(response.status_code, 200)  # OK
+        self.assertEqual(response.data, [])
+
+
 class CurrentPatientTests(AngelikaAPITestCase):
     def test_call_me_request(self):
         user = self.force_authenticate('larsoverhaug')
