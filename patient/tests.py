@@ -426,7 +426,9 @@ class GetTests(AngelikaAPITestCase):
         self.force_authenticate('helselise')
         response = self.client.get('/patients/1/graph_data/?type=O')
         self.assertEqual(response.status_code, 200)  # OK
-        self.assertEqual(response.data, [])
+        self.assertTrue('measurements' in response.data)
+        self.assertTrue('lower_threshold_values' in response.data)
+        self.assertTrue('upper_threshold_values' in response.data)
 
 
 class CurrentPatientTests(AngelikaAPITestCase):

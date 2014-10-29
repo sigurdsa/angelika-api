@@ -1,6 +1,6 @@
 from .models import Patient
 from rest_framework import viewsets
-from .serializers import PatientListSerializer, PatientDetailSerializer, CurrentPatientSerializer
+from .serializers import PatientListSerializer, PatientDetailSerializer, CurrentPatientSerializer, PatientGraphSeriesSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from api.permissions import IsHealthProfessional, IsPatient
@@ -13,7 +13,6 @@ from django.utils import timezone
 from datetime import timedelta
 from rest_framework.decorators import detail_route
 from rest_framework.exceptions import ParseError
-from measurement.serializers import MeasurementGraphSerializer
 
 
 class PatientViewSet(viewsets.ModelViewSet):
@@ -107,8 +106,7 @@ class PatientViewSet(viewsets.ModelViewSet):
         if not type in ['A', 'O', 'P', 'T']:
             raise ParseError(detail="type must be one of the following values: 'A', 'O', 'P', 'T'")
 
-        queryset = Measurement.objects.filter(patient=self.get_object(), type=type)
-        serializer = MeasurementGraphSerializer(queryset, many=True)
+        serializer = PatientGraphSeriesSerializer(instance=self.get_object(), context={'type': type})
         return Response(serializer.data)
 
 

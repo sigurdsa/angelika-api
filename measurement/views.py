@@ -1,6 +1,6 @@
 from .models import Measurement
 from rest_framework import viewsets
-from .serializers import MeasurementGraphSerializer
+from graph.serializers import MeasurementGraphSerializer
 from rest_framework.exceptions import ParseError
 from api.permissions import IsPatient
 from rest_framework.permissions import IsAuthenticated
