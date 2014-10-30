@@ -1,6 +1,7 @@
 from .models import Patient
 from rest_framework import viewsets
-from .serializers import PatientListSerializer, PatientDetailSerializer, CurrentPatientSerializer, PatientGraphSeriesSerializer
+from .serializers import PatientListSerializer, PatientDetailSerializer, CurrentPatientSerializer,\
+    PatientGraphSeriesSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from api.permissions import IsHealthProfessional, IsPatient

@@ -15,5 +15,3 @@ class PatientAlarmMeasurementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Measurement
         fields = ('type', 'value')
-
-

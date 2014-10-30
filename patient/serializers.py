@@ -177,4 +177,3 @@ class PatientGraphSeriesSerializer(serializers.ModelSerializer):
         queryset = ThresholdValue.objects.filter(patient=obj, type=self.context['type'], is_upper_threshold=True)
         serializer = ThresholdValueGraphSeriesSerializer(queryset, many=True)
         return serializer.data
-
