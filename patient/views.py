@@ -154,14 +154,7 @@ class CurrentPatient(APIView):
 
     def get(self, request, format=None):
         patient = request.user.patient
-        exclude_fields = []
-        if not patient.o2_access:
-            exclude_fields += ['o2_min', 'o2_max']
-        if not patient.pulse_access:
-            exclude_fields += ['pulse_min', 'pulse_max']
-        if not patient.temperature_access:
-            exclude_fields += ['temperature_min', 'temperature_max']
-        serializer = CurrentPatientSerializer(instance=patient, exclude=exclude_fields)
+        serializer = CurrentPatientSerializer(instance=patient)
         return Response(serializer.data)
 
 
