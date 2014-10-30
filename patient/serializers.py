@@ -6,6 +6,9 @@ from next_of_kin.models import NextOfKin
 from next_of_kin.serializers import NextOfKinSerializer
 from motivation_text.models import MotivationText
 from motivation_text.serializers import MotivationTextSerializer
+from measurement.models import Measurement
+from graph.serializers import MeasurementGraphSeriesSerializer, ThresholdValueGraphSeriesSerializer
+from threshold_value.models import ThresholdValue
 
 
 class SimpleUserSerializer(serializers.ModelSerializer):
@@ -71,6 +74,12 @@ class PatientDetailSerializer(PatientListSerializer):
     next_of_kin = serializers.SerializerMethodField('get_next_of_kin')
     motivation_texts = serializers.SerializerMethodField('get_motivation_texts')
     information_texts = serializers.SerializerMethodField('get_information_texts')
+    o2_min = serializers.SerializerMethodField('get_o2_min')
+    o2_max = serializers.SerializerMethodField('get_o2_max')
+    pulse_min = serializers.SerializerMethodField('get_pulse_min')
+    pulse_max = serializers.SerializerMethodField('get_pulse_max')
+    temperature_min = serializers.SerializerMethodField('get_temperature_min')
+    temperature_max = serializers.SerializerMethodField('get_temperature_max')
 
     def get_next_of_kin(self, obj):
         next_of_kin = NextOfKin.objects.filter(patient__id=obj.id)
@@ -87,6 +96,54 @@ class PatientDetailSerializer(PatientListSerializer):
         serializer = MotivationTextSerializer(information_texts, many=True, context=self.context)
         return serializer.data
 
+    def get_o2_min(self, obj):
+        threshold_value = ThresholdValue.objects.filter(
+            patient_id=obj.id,
+            type='O',
+            is_upper_threshold=False
+        ).last()
+        return threshold_value.value if threshold_value else None
+
+    def get_o2_max(self, obj):
+        threshold_value = ThresholdValue.objects.filter(
+            patient_id=obj.id,
+            type='O',
+            is_upper_threshold=True
+        ).last()
+        return threshold_value.value if threshold_value else None
+
+    def get_pulse_min(self, obj):
+        threshold_value = ThresholdValue.objects.filter(
+            patient_id=obj.id,
+            type='P',
+            is_upper_threshold=False
+        ).last()
+        return threshold_value.value if threshold_value else None
+
+    def get_pulse_max(self, obj):
+        threshold_value = ThresholdValue.objects.filter(
+            patient_id=obj.id,
+            type='P',
+            is_upper_threshold=True
+        ).last()
+        return threshold_value.value if threshold_value else None
+
+    def get_temperature_min(self, obj):
+        threshold_value = ThresholdValue.objects.filter(
+            patient_id=obj.id,
+            type='T',
+            is_upper_threshold=False
+        ).last()
+        return threshold_value.value if threshold_value else None
+
+    def get_temperature_max(self, obj):
+        threshold_value = ThresholdValue.objects.filter(
+            patient_id=obj.id,
+            type='T',
+            is_upper_threshold=True
+        ).last()
+        return threshold_value.value if threshold_value else None
+
     class Meta(PatientListSerializer.Meta):
         fields = PatientListSerializer.Meta.fields + [
             'address',
@@ -95,12 +152,12 @@ class PatientDetailSerializer(PatientListSerializer):
             'next_of_kin',
             'motivation_texts',
             'information_texts',
-            'pulse_max',
-            'pulse_min',
-            'o2_max',
             'o2_min',
-            'temperature_max',
+            'o2_max',
+            'pulse_min',
+            'pulse_max',
             'temperature_min',
+            'temperature_max',
             'activity_access',
             'pulse_access',
             'o2_access',
@@ -123,14 +180,6 @@ class CurrentPatientSerializer(serializers.ModelSerializer):
         serializer = MotivationTextSerializer(information_texts, many=True, context=self.context)
         return serializer.data
 
-    def __init__(self, *args, **kwargs):
-        exclude = kwargs.pop('exclude', None)
-        super(CurrentPatientSerializer, self).__init__(*args, **kwargs)
-        if exclude:
-            # Drop any fields that are specified in the `exclude` argument.
-            for field_name in exclude:
-                self.fields.pop(field_name)
-
     class Meta:
         model = Patient
         fields = [
@@ -138,14 +187,33 @@ class CurrentPatientSerializer(serializers.ModelSerializer):
             'user',
             'motivation_texts',
             'information_texts',
-            'pulse_max',
-            'pulse_min',
-            'o2_max',
-            'o2_min',
-            'temperature_max',
-            'temperature_min',
             'activity_access',
             'pulse_access',
             'o2_access',
             'temperature_access'
         ]
+
+
+class PatientGraphSeriesSerializer(serializers.ModelSerializer):
+    measurements = serializers.SerializerMethodField('get_measurements')
+    lower_threshold_values = serializers.SerializerMethodField('get_lower_threshold_values')
+    upper_threshold_values = serializers.SerializerMethodField('get_upper_threshold_values')
+
+    class Meta:
+        model = Patient
+        fields = ('measurements', 'lower_threshold_values', 'upper_threshold_values')
+
+    def get_measurements(self, obj):
+        queryset = Measurement.objects.filter(patient=obj, type=self.context['type'])
+        serializer = MeasurementGraphSeriesSerializer(queryset, many=True)
+        return serializer.data
+
+    def get_lower_threshold_values(self, obj):
+        queryset = ThresholdValue.objects.filter(patient=obj, type=self.context['type'], is_upper_threshold=False)
+        serializer = ThresholdValueGraphSeriesSerializer(queryset, many=True)
+        return serializer.data
+
+    def get_upper_threshold_values(self, obj):
+        queryset = ThresholdValue.objects.filter(patient=obj, type=self.context['type'], is_upper_threshold=True)
+        serializer = ThresholdValueGraphSeriesSerializer(queryset, many=True)
+        return serializer.data
