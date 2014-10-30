@@ -4,6 +4,9 @@ from next_of_kin.models import NextOfKin
 from motivation_text.models import MotivationText
 from measurement.models import Measurement
 from alarm.models import Alarm
+from django.utils import timezone
+from datetime import timedelta
+from threshold_value.models import ThresholdValue
 
 
 class PermissionTests(AngelikaAPITestCase):
@@ -421,14 +424,109 @@ class PatchTests(AngelikaAPITestCase):
         self.assertEqual(motivation_text.text, 'HEI')
 
 
-class GetTests(AngelikaAPITestCase):
-    def test_graph_data(self):
+class GetGraphDataTests(AngelikaAPITestCase):
+    def test_graph_data_endpoint_accessible(self):
         self.force_authenticate('helselise')
         response = self.client.get('/patients/1/graph_data/?type=O')
         self.assertEqual(response.status_code, 200)  # OK
         self.assertTrue('measurements' in response.data)
         self.assertTrue('lower_threshold_values' in response.data)
         self.assertTrue('upper_threshold_values' in response.data)
+
+    def test_graph_data_threshold_values(self):
+        self.force_authenticate('helselise')
+        self.create_patient('ystenes', 'Hallgeir', 'Ystenes')
+        patient1 = Patient.objects.all().first()
+        patient2 = Patient.objects.all().last()
+
+        ThresholdValue.objects.create(
+            patient=patient1,
+            type='P',
+            time=timezone.now() - timedelta(days=30),
+            value=58.0,
+            is_upper_threshold=False
+        )
+        ThresholdValue.objects.create(
+            patient=patient1,
+            type='P',
+            time=timezone.now(),
+            value=55.0,
+            is_upper_threshold=False
+        )
+        ThresholdValue.objects.create(
+            patient=patient1,
+            type='P',
+            time=timezone.now(),
+            value=150.0,
+            is_upper_threshold=True
+        )
+
+        # The following two threshold values are expected to not be included in the response below
+        ThresholdValue.objects.create(
+            patient=patient1,
+            type='O',
+            time=timezone.now(),
+            value=100.0,
+            is_upper_threshold=False
+        )
+        ThresholdValue.objects.create(
+            patient=patient2,
+            type='P',
+            time=timezone.now(),
+            value=120.0,
+            is_upper_threshold=True
+        )
+
+        response = self.client.get('/patients/' + str(patient1.id) + '/graph_data/?type=P')
+        self.assertEqual(len(response.data['lower_threshold_values']), 2)
+        self.assertEqual(len(response.data['upper_threshold_values']), 1)
+
+        self.assertAlmostEqual(response.data['lower_threshold_values'][1]['y'], 55.0)
+        self.assertAlmostEqual(response.data['upper_threshold_values'][0]['y'], 150.0)
+
+        try:
+            unix_time = int(response.data['upper_threshold_values'][0]['x'])
+            self.assertGreater(unix_time, 1400000000000)  # May 13, 2014
+        except ValueError:
+            self.fail("x in the first object in upper_threshold_values has unexpected format."
+                      " It should be an int (unix time).")
+
+    def test_graph_data_measurements(self):
+        self.force_authenticate('helselise')
+        self.create_patient('ystenes', 'Hallgeir', 'Ystenes')
+        patient1 = Patient.objects.all().first()
+        patient2 = Patient.objects.all().last()
+
+        Measurement.objects.create(
+            patient=patient1,
+            type='O',
+            time=timezone.now() - timedelta(days=1),
+            value=60.0
+        )
+        Measurement.objects.create(
+            patient=patient1,
+            type='O',
+            time=timezone.now(),
+            value=58.0
+        )
+
+        # The following two measurements are expected to not be included in the response below
+        Measurement.objects.create(
+            patient=patient1,
+            type='A',
+            time=timezone.now(),
+            value=600
+        )
+        Measurement.objects.create(
+            patient=patient2,
+            type='O',
+            time=timezone.now(),
+            value=600
+        )
+
+        response = self.client.get('/patients/' + str(patient1.id) + '/graph_data/?type=O')
+        self.assertEqual(len(response.data['measurements']), 2)
+        self.assertAlmostEqual(response.data['measurements'][1]['y'], 58.0)
 
 
 class CurrentPatientTests(AngelikaAPITestCase):
