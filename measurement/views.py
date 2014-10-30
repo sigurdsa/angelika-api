@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from django.core.exceptions import PermissionDenied
 from rest_framework.response import Response
+from patient.serializers import PatientGraphSeriesSerializer
 
 
 class CurrentPatientMeasurements(APIView):
@@ -29,6 +30,5 @@ class CurrentPatientMeasurements(APIView):
         if 'T' == type and not patient.temperature_access:
             raise PermissionDenied()
 
-        queryset = Measurement.objects.filter(patient__id=patient.id, type=type)
-        serializer = MeasurementGraphSeriesSerializer(queryset, many=True)
+        serializer = PatientGraphSeriesSerializer(instance=patient, context={'type': type})
         return Response(serializer.data)
