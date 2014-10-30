@@ -7,7 +7,8 @@ from next_of_kin.serializers import NextOfKinSerializer
 from motivation_text.models import MotivationText
 from motivation_text.serializers import MotivationTextSerializer
 from measurement.models import Measurement
-from graph.serializers import MeasurementGraphSerializer
+from graph.serializers import MeasurementGraphSeriesSerializer, ThresholdValueGraphSeriesSerializer
+from threshold_value.models import ThresholdValue
 
 
 class SimpleUserSerializer(serializers.ModelSerializer):
@@ -164,12 +165,16 @@ class PatientGraphSeriesSerializer(serializers.ModelSerializer):
 
     def get_measurements(self, obj):
         queryset = Measurement.objects.filter(patient=obj, type=self.context['type'])
-        serializer = MeasurementGraphSerializer(queryset, many=True)
+        serializer = MeasurementGraphSeriesSerializer(queryset, many=True)
         return serializer.data
 
     def get_lower_threshold_values(self, obj):
-        return []
+        queryset = ThresholdValue.objects.filter(patient=obj, type=self.context['type'], is_upper_threshold=False)
+        serializer = ThresholdValueGraphSeriesSerializer(queryset, many=True)
+        return serializer.data
 
     def get_upper_threshold_values(self, obj):
-        return []
+        queryset = ThresholdValue.objects.filter(patient=obj, type=self.context['type'], is_upper_threshold=True)
+        serializer = ThresholdValueGraphSeriesSerializer(queryset, many=True)
+        return serializer.data
 

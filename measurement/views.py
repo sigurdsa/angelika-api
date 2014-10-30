@@ -1,6 +1,6 @@
 from .models import Measurement
 from rest_framework import viewsets
-from graph.serializers import MeasurementGraphSerializer
+from graph.serializers import MeasurementGraphSeriesSerializer
 from rest_framework.exceptions import ParseError
 from api.permissions import IsPatient
 from rest_framework.permissions import IsAuthenticated
@@ -30,5 +30,5 @@ class CurrentPatientMeasurements(APIView):
             raise PermissionDenied()
 
         queryset = Measurement.objects.filter(patient__id=patient.id, type=type)
-        serializer = MeasurementGraphSerializer(queryset, many=True)
+        serializer = MeasurementGraphSeriesSerializer(queryset, many=True)
         return Response(serializer.data)
