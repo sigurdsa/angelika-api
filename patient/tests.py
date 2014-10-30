@@ -425,13 +425,26 @@ class PatchTests(AngelikaAPITestCase):
 
 
 class GetGraphDataTests(AngelikaAPITestCase):
-    def test_graph_data_endpoint_accessible(self):
+    def test_patient_graph_data_endpoint(self):
         self.force_authenticate('helselise')
         response = self.client.get('/patients/1/graph_data/?type=O')
         self.assertEqual(response.status_code, 200)  # OK
         self.assertTrue('measurements' in response.data)
         self.assertTrue('lower_threshold_values' in response.data)
         self.assertTrue('upper_threshold_values' in response.data)
+
+    def test_current_patient_graph_data_endpoint(self):
+        self.force_authenticate('larsoverhaug')
+        response = self.client.get('/current-patient/graph_data/?type=A')
+        self.assertEqual(response.status_code, 200)  # OK
+        self.assertTrue('measurements' in response.data)
+        self.assertTrue('lower_threshold_values' in response.data)
+        self.assertTrue('upper_threshold_values' in response.data)
+
+    def test_current_patient_graph_data_no_permission(self):
+        self.force_authenticate('larsoverhaug')
+        response = self.client.get('/current-patient/graph_data/?type=O')
+        self.assertEqual(response.status_code, 403)  # Forbidden
 
     def test_graph_data_threshold_values(self):
         self.force_authenticate('helselise')
