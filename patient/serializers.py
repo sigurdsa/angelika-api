@@ -110,6 +110,18 @@ class PatientDetailSerializer(PatientListSerializer):
 
 class CurrentPatientSerializer(serializers.ModelSerializer):
     user = SimpleUserSerializer()
+    motivation_texts = serializers.SerializerMethodField('get_motivation_texts')
+    information_texts = serializers.SerializerMethodField('get_information_texts')
+
+    def get_motivation_texts(self, obj):
+        motivation_texts = MotivationText.objects.filter(patient=obj, type='M')
+        serializer = MotivationTextSerializer(motivation_texts, many=True, context=self.context)
+        return serializer.data
+
+    def get_information_texts(self, obj):
+        information_texts = MotivationText.objects.filter(patient=obj, type='I')
+        serializer = MotivationTextSerializer(information_texts, many=True, context=self.context)
+        return serializer.data
 
     def __init__(self, *args, **kwargs):
         exclude = kwargs.pop('exclude', None)
@@ -124,6 +136,8 @@ class CurrentPatientSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'user',
+            'motivation_texts',
+            'information_texts',
             'pulse_max',
             'pulse_min',
             'o2_max',
