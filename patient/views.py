@@ -14,6 +14,7 @@ from django.utils import timezone
 from datetime import timedelta
 from rest_framework.decorators import detail_route
 from rest_framework.exceptions import ParseError
+from threshold_value.models import ThresholdValue
 
 
 class PatientViewSet(viewsets.ModelViewSet):
@@ -96,6 +97,40 @@ class PatientViewSet(viewsets.ModelViewSet):
                         patient__id=patient_id, type='I'):
                     if not information_text.id in information_text_ids:
                         information_text.delete()
+
+        def update_or_create_threshold_value(value, type, is_upper_threshold):
+            existing_threshold_value = ThresholdValue.objects.filter(
+                patient_id=patient_id,
+                type=type,
+                is_upper_threshold=is_upper_threshold
+            ).last()
+
+            if (existing_threshold_value and existing_threshold_value.value != value)\
+                    or existing_threshold_value is None:
+                ThresholdValue.objects.create(
+                    value=value,
+                    patient_id=patient_id,
+                    type=type,
+                    is_upper_threshold=is_upper_threshold
+                )
+
+        if 'o2_min' in request.DATA:
+            update_or_create_threshold_value(request.DATA['o2_min'], 'O', False)
+
+        if 'o2_max' in request.DATA:
+            update_or_create_threshold_value(request.DATA['o2_max'], 'O', True)
+
+        if 'pulse_min' in request.DATA:
+            update_or_create_threshold_value(request.DATA['pulse_min'], 'P', False)
+
+        if 'pulse_max' in request.DATA:
+            update_or_create_threshold_value(request.DATA['pulse_max'], 'P', True)
+
+        if 'temperature_min' in request.DATA:
+            update_or_create_threshold_value(request.DATA['temperature_min'], 'T', False)
+
+        if 'temperature_max' in request.DATA:
+            update_or_create_threshold_value(request.DATA['temperature_max'], 'T', True)
 
         return self.update(request, *args, **kwargs)
 
