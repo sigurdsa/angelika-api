@@ -2,7 +2,7 @@ from .models import Measurement
 from rest_framework import viewsets
 from .serializers import MeasurementGraphSerializer
 from rest_framework.exceptions import ParseError
-from api.permissions import IsHealthProfessional, IsPatient
+from api.permissions import IsHealthProfessional, IsPatient, IsHub
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from django.core.exceptions import PermissionDenied
@@ -59,22 +59,14 @@ class CurrentPatientMeasurements(APIView):
         return Response(serializer.data)
 
 class PostMeasurements(APIView):
-    permission_classes = () # TODO: Fix permissions, for example (IsAuthenticated, IsHub,)
+    permission_classes = (IsAuthenticated, IsHub) # TODO: Fix permissions, for example (IsAuthenticated, IsHub,)
 
     def post(self, request, format=None):
-        print request.DATA
-        print len(request.DATA)
-
-        print ""
-
-        print "Observation: ", request.DATA.get("Observation")
-
-        print "HUB_ID: ", request.DATA.get("Observation").get("hub_id")
         hub_id = request.DATA.get("Observation").get("hub_id")
 
         # print "Measurements: ", request.DATA.get("Measurements")
-        print "Measurements: "
-        print request.DATA.get("Measurements")
+        # print "Measurements: "
+        # print request.DATA.get("Measurements")
 
         count = 0 # just to know how many measurements gets created
 
@@ -92,7 +84,6 @@ class PostMeasurements(APIView):
 
             count += 1
 
-
             # Map hub-type --> model type
             allowed_types = {"heart_rate" : 'P', "spo2": 'O', "steps": 'A'} # Maps value to model type
             type = allowed_types[type]
@@ -105,9 +96,17 @@ class PostMeasurements(APIView):
             time = datetime.utcfromtimestamp(date)
 
             # TODO map hub id to patient id!!!!
-            patient_id = Patient.objects.all().first().id
+            # patient_id = Patient.objects.all().first().id
+            patient = Patient.objects.get(hub_id=hub_id)
 
-            print "Will create measurement object with Time: ", time, "Type: ", type, "Value: ", value, "Unit: ", unit, " from hub: ", hub_id
+            if patient:
+                patient_id = patient.id
+            else:
+                # TODO handle this!
+                pass
+
+
+            print "Will create measurement object with Time: ", time, "Type: ", type, "Value: ", value, "Unit: ", unit, " from hub: ", hub_id, "to patient_id: ", patient_id
 
 
             Measurement.objects.create(
