@@ -4,7 +4,7 @@ from django.utils.encoding import smart_unicode
 
 
 class Patient(models.Model):
-    hub_id = models.CharField(max_length=12, null=True)
+    hub = models.OneToOneField(User, null=True, blank=True, related_name='hub_patient')
     user = models.OneToOneField(User, null=True)
     national_identification_number = models.CharField(
         default="",
