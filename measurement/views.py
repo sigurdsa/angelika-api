@@ -30,5 +30,8 @@ class CurrentPatientMeasurements(APIView):
         if 'T' == type and not patient.temperature_access:
             raise PermissionDenied()
 
-        serializer = PatientGraphSeriesSerializer(instance=patient, context={'type': type})
+        serializer = PatientGraphSeriesSerializer(
+            instance=patient,
+            context={'type': type, 'exclude_measurement_alarms': True}
+        )
         return Response(serializer.data)

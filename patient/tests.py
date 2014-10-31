@@ -434,14 +434,27 @@ class GetGraphDataTests(AngelikaAPITestCase):
         self.assertTrue('upper_threshold_values' in response.data)
 
     def test_current_patient_graph_data_endpoint(self):
-        self.force_authenticate('larsoverhaug')
+        user = self.force_authenticate('larsoverhaug')
+
+        Measurement.objects.create(
+            patient=user.patient,
+            type='A',
+            time=timezone.now(),
+            value=58.0
+        )
+
         response = self.client.get('/current-patient/graph_data/?type=A')
         self.assertEqual(response.status_code, 200)  # OK
         self.assertTrue('measurements' in response.data)
         self.assertTrue('lower_threshold_values' in response.data)
         self.assertTrue('upper_threshold_values' in response.data)
+        self.assertEqual(len(response.data['measurements']), 1)
+        self.assertFalse('alarm' in response.data['measurements'][0])
 
     def test_current_patient_graph_data_no_permission(self):
+        """
+        Patient larsoverhaug does not have permission to see his own O2 data
+        """
         self.force_authenticate('larsoverhaug')
         response = self.client.get('/current-patient/graph_data/?type=O')
         self.assertEqual(response.status_code, 403)  # Forbidden
@@ -540,6 +553,34 @@ class GetGraphDataTests(AngelikaAPITestCase):
         response = self.client.get('/patients/' + str(patient1.id) + '/graph_data/?type=O')
         self.assertEqual(len(response.data['measurements']), 2)
         self.assertAlmostEqual(response.data['measurements'][1]['y'], 58.0)
+
+    def test_graph_data_alarms(self):
+        self.force_authenticate('helselise')
+        patient1 = Patient.objects.all().first()
+
+        Measurement.objects.create(
+            patient=patient1,
+            type='O',
+            time=timezone.now() - timedelta(days=1),
+            value=60.0
+        )
+        measurement2 = Measurement.objects.create(
+            patient=patient1,
+            type='O',
+            time=timezone.now(),
+            value=58.0
+        )
+
+        alarm = Alarm.objects.create(
+            measurement=measurement2,
+            time_created=timezone.now()
+        )
+
+        response = self.client.get('/patients/' + str(patient1.id) + '/graph_data/?type=O')
+        self.assertEqual(len(response.data['measurements']), 2)
+        self.assertTrue('alarm' in response.data['measurements'][0])
+        self.assertEqual(response.data['measurements'][0]['alarm'], None)
+        self.assertEqual(response.data['measurements'][1]['alarm']['id'], alarm.id)
 
 
 class CurrentPatientTests(AngelikaAPITestCase):
