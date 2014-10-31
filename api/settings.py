@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'measurement',
     'motivation_text',
     'next_of_kin',
+    'threshold_value'
 )
 
 MIDDLEWARE_CLASSES = (

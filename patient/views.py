@@ -1,6 +1,7 @@
 from .models import Patient
 from rest_framework import viewsets
-from .serializers import PatientListSerializer, PatientDetailSerializer, CurrentPatientSerializer
+from .serializers import PatientListSerializer, PatientDetailSerializer, CurrentPatientSerializer,\
+    PatientGraphSeriesSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from api.permissions import IsHealthProfessional, IsPatient
@@ -11,6 +12,9 @@ from measurement.models import Measurement
 from alarm.models import Alarm
 from django.utils import timezone
 from datetime import timedelta
+from rest_framework.decorators import detail_route
+from rest_framework.exceptions import ParseError
+from threshold_value.models import ThresholdValue
 
 
 class PatientViewSet(viewsets.ModelViewSet):
@@ -94,7 +98,52 @@ class PatientViewSet(viewsets.ModelViewSet):
                     if not information_text.id in information_text_ids:
                         information_text.delete()
 
+        def update_or_create_threshold_value(value, type, is_upper_threshold):
+            existing_threshold_value = ThresholdValue.objects.filter(
+                patient_id=patient_id,
+                type=type,
+                is_upper_threshold=is_upper_threshold
+            ).last()
+
+            if (existing_threshold_value and existing_threshold_value.value != value)\
+                    or existing_threshold_value is None:
+                ThresholdValue.objects.create(
+                    value=value,
+                    patient_id=patient_id,
+                    type=type,
+                    is_upper_threshold=is_upper_threshold
+                )
+
+        if 'o2_min' in request.DATA:
+            update_or_create_threshold_value(request.DATA['o2_min'], 'O', False)
+
+        if 'o2_max' in request.DATA:
+            update_or_create_threshold_value(request.DATA['o2_max'], 'O', True)
+
+        if 'pulse_min' in request.DATA:
+            update_or_create_threshold_value(request.DATA['pulse_min'], 'P', False)
+
+        if 'pulse_max' in request.DATA:
+            update_or_create_threshold_value(request.DATA['pulse_max'], 'P', True)
+
+        if 'temperature_min' in request.DATA:
+            update_or_create_threshold_value(request.DATA['temperature_min'], 'T', False)
+
+        if 'temperature_max' in request.DATA:
+            update_or_create_threshold_value(request.DATA['temperature_max'], 'T', True)
+
         return self.update(request, *args, **kwargs)
+
+    @detail_route()
+    def graph_data(self, request, pk=None):
+        type = self.request.QUERY_PARAMS.get('type', None)
+        if type is None:
+            raise ParseError(detail="Query string 'type' is not specified")
+        if not type in ['A', 'O', 'P', 'T']:
+            raise ParseError(detail="type must be one of the following values: 'A', 'O', 'P', 'T'")
+
+        serializer = PatientGraphSeriesSerializer(instance=self.get_object(), context={'type': type})
+        return Response(serializer.data)
 
 
 class CurrentPatient(APIView):
@@ -105,14 +154,7 @@ class CurrentPatient(APIView):
 
     def get(self, request, format=None):
         patient = request.user.patient
-        exclude_fields = []
-        if not patient.o2_access:
-            exclude_fields += ['o2_min', 'o2_max']
-        if not patient.pulse_access:
-            exclude_fields += ['pulse_min', 'pulse_max']
-        if not patient.temperature_access:
-            exclude_fields += ['temperature_min', 'temperature_max']
-        serializer = CurrentPatientSerializer(instance=patient, exclude=exclude_fields)
+        serializer = CurrentPatientSerializer(instance=patient)
         return Response(serializer.data)
 
 

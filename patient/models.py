@@ -4,7 +4,7 @@ from django.utils.encoding import smart_unicode
 
 
 class Patient(models.Model):
-    hub_id = models.CharField(max_length=12, null=True)
+    hub = models.OneToOneField(User, null=True, blank=True, related_name='hub_patient')
     user = models.OneToOneField(User, null=True)
     national_identification_number = models.CharField(
         default="",
@@ -15,12 +15,6 @@ class Patient(models.Model):
     address = models.CharField(max_length=255, blank=True, null=True)
     zip_code = models.CharField(max_length=4, blank=True, null=True)
     city = models.CharField(max_length=120, blank=True, null=True)
-    pulse_max = models.FloatField(default=0)
-    pulse_min = models.FloatField(default=0)
-    o2_max = models.FloatField(default=0)
-    o2_min = models.FloatField(default=0)
-    temperature_max = models.FloatField(default=0)
-    temperature_min = models.FloatField(default=0)
     activity_access = models.BooleanField(
         default=False,
         help_text="If True, the patient has access to view activity data in patient interface"
