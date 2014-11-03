@@ -20,4 +20,5 @@ urlpatterns = patterns(
     url(r'^current-patient/call_me/', patient_views.CurrentPatientCallMeRequest.as_view()),
     url(r'^current-patient/graph_data/', measurement_views.CurrentPatientMeasurements.as_view()),
     url(r'^current-patient/', patient_views.CurrentPatient.as_view()),
+    url(r'^post-measurements/', measurement_views.PostMeasurements.as_view()),
 )
