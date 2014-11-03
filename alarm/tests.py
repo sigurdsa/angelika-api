@@ -4,6 +4,7 @@ from patient.models import Patient
 from measurement.models import Measurement
 from django.utils import timezone
 from datetime import timedelta
+from motivation_text.models import MotivationText
 
 
 class PermissionTests(AngelikaAPITestCase):
@@ -113,3 +114,64 @@ class GetTests(AngelikaAPITestCase):
         self.force_authenticate('helselise')
         response = self.client.get('/alarms/?patient_id=asd')
         self.assertEqual(response.status_code, 400)  # Bad request
+
+
+class PostTests(AngelikaAPITestCase):
+    def test_handle(self):
+        patient1 = Patient.objects.first()
+        measurement1 = Measurement.objects.create(
+            type='O',
+            value=96.5,
+            patient=patient1,
+            time=timezone.now()
+        )
+        alarm1 = Alarm.objects.create(
+            measurement=measurement1,
+            time_created=timezone.now()
+        )
+
+        self.force_authenticate('helselise')
+        response = self.client.post(
+            '/alarms/' + str(alarm1.id) + '/handle/',
+            {
+                'alarm': {
+                    'is_treated': True,
+                    'treated_text': 'Ensom',
+                },
+                'motivation_text': 'Ta en kaffe med Ole-Petter'
+            },
+            'json'
+        )
+
+        self.assertEqual(response.status_code, 200)  # OK
+        self.assertEqual(response.data['treated_text'], 'Ensom')
+        self.assertEqual(response.data['is_treated'], True)
+        self.assertEqual(MotivationText.objects.all().count(), 1)
+
+    def test_handle_without_motivation_text(self):
+        patient1 = Patient.objects.first()
+        measurement1 = Measurement.objects.create(
+            type='O',
+            value=96.5,
+            patient=patient1,
+            time=timezone.now()
+        )
+        alarm1 = Alarm.objects.create(
+            measurement=measurement1,
+            time_created=timezone.now()
+        )
+
+        self.force_authenticate('helselise')
+        self.client.post(
+            '/alarms/' + str(alarm1.id) + '/handle/',
+            {
+                'alarm': {
+                    'is_treated': True,
+                    'treated_text': 'Ensom',
+                },
+                'motivation_text': ''
+            },
+            'json'
+        )
+
+        self.assertEqual(MotivationText.objects.all().count(), 0)
