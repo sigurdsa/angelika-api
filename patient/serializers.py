@@ -9,6 +9,7 @@ from motivation_text.serializers import MotivationTextSerializer
 from measurement.models import Measurement
 from graph.serializers import MeasurementGraphSeriesSerializer, ThresholdValueGraphSeriesSerializer
 from threshold_value.models import ThresholdValue
+from alarm.models import Alarm
 
 
 class SimpleUserSerializer(serializers.ModelSerializer):
@@ -204,9 +205,20 @@ class PatientGraphSeriesSerializer(serializers.ModelSerializer):
         fields = ('measurements', 'lower_threshold_values', 'upper_threshold_values')
 
     def get_measurements(self, obj):
-        queryset = Measurement.objects.filter(patient=obj, type=self.context['type'])
-        serializer = MeasurementGraphSeriesSerializer(queryset, many=True)
-        return serializer.data
+        measurements = Measurement.objects.filter(
+            patient=obj,
+            type=self.context['type'],
+            time__gte=self.context['min_time']
+        )
+        if 'exclude_measurement_alarms' in self.context and self.context['exclude_measurement_alarms']:
+            serializer = MeasurementGraphSeriesSerializer(measurements, many=True)
+            return serializer.data
+        else:
+            measurement_ids = map(lambda measurement: measurement.id, measurements)
+            alarms = Alarm.objects.filter(measurement_id__in=measurement_ids)
+            alarm_dict = dict((alarm.measurement_id, alarm) for alarm in alarms)  # key is measurement id
+            serializer = MeasurementGraphSeriesSerializer(measurements, many=True, alarm_dict=alarm_dict)
+            return serializer.data
 
     def get_lower_threshold_values(self, obj):
         queryset = ThresholdValue.objects.filter(patient=obj, type=self.context['type'], is_upper_threshold=False)

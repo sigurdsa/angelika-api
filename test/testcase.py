@@ -22,7 +22,6 @@ class AngelikaAPITestCase(APITestCase):
         patient_user.save()
         patient_user.groups.add(Group.objects.get(name='patients'))
         patient = Patient.objects.create(
-            hub_id='hub-trd-1',
             user=patient_user,
             national_identification_number='02094523456',
             phone_number='45763984',

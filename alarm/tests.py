@@ -105,6 +105,7 @@ class GetTests(AngelikaAPITestCase):
         self.assertTrue('results' in response.data)
         alarms = response.data['results']
         alarm1 = alarms[0]
+        self.assertTrue('treated_text' in alarm1)
         self.assertAlmostEqual(alarm1['measurement']['value'], 90.5)
         self.assertFalse('patient' in alarm1['measurement'])
 

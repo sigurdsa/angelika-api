@@ -142,7 +142,13 @@ class PatientViewSet(viewsets.ModelViewSet):
         if not type in ['A', 'O', 'P', 'T']:
             raise ParseError(detail="type must be one of the following values: 'A', 'O', 'P', 'T'")
 
-        serializer = PatientGraphSeriesSerializer(instance=self.get_object(), context={'type': type})
+        serializer = PatientGraphSeriesSerializer(
+            instance=self.get_object(),
+            context={
+                'type': type,
+                'min_time': timezone.now() - timedelta(days=365)
+            }
+        )
         return Response(serializer.data)
 
 

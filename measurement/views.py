@@ -9,6 +9,8 @@ from rest_framework.response import Response
 from datetime import datetime
 from patient.models import Patient
 from patient.serializers import PatientGraphSeriesSerializer
+from django.utils import timezone
+from datetime import timedelta
 
 import pytz
 
@@ -33,7 +35,14 @@ class CurrentPatientMeasurements(APIView):
         if 'T' == type and not patient.temperature_access:
             raise PermissionDenied()
 
-        serializer = PatientGraphSeriesSerializer(instance=patient, context={'type': type})
+        serializer = PatientGraphSeriesSerializer(
+            instance=patient,
+            context={
+                'type': type,
+                'exclude_measurement_alarms': True,
+                'min_time': timezone.now() - timedelta(days=7)
+            }
+        )
         return Response(serializer.data)
 
 class PostMeasurements(APIView):
