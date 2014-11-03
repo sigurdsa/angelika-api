@@ -6,9 +6,9 @@ from patient.models import Patient
 class AngelikaAPITestCase(APITestCase):
 
     def setUp(self):
-        health_professional_group = Group.objects.create(name='health-professionals')
         Group.objects.create(name='patients')
 
+        health_professional_group = Group.objects.create(name='health-professionals')
         health_professional_user = User.objects.create_user('helselise', 'lise@angelika.no', 'test')
         health_professional_user.save()
         health_professional_user.groups.add(health_professional_group)

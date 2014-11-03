@@ -45,6 +45,7 @@ class CurrentPatientMeasurements(APIView):
         )
         return Response(serializer.data)
 
+
 class PostMeasurements(APIView):
     permission_classes = (IsAuthenticated, IsHub, )
 
@@ -59,13 +60,12 @@ class PostMeasurements(APIView):
         else:
             return Response({"hub_id could not be mapped to patient": -1}, status=status.HTTP_400_BAD_REQUEST)
 
-
-        count = 0 # How many measurements gets created?
+        count = 0  # How many measurements gets created?
 
         for measurement in request.DATA.get("Measurements"):
 
             date = measurement.get("date")
-            m_type = measurement.get("type") # only steps should be used for now
+            m_type = measurement.get("type")  # only steps should be used for now
             unit = measurement.get("unit")
             value = measurement.get("value")
 
@@ -77,7 +77,7 @@ class PostMeasurements(APIView):
             count += 1
 
             # Map hub-type --> model type
-            allowed_types = {"heart_rate": 'P', "spo2": 'O', "steps": 'A'} # Maps value to model type
+            allowed_types = {"heart_rate": 'P', "spo2": 'O', "steps": 'A'}  # Maps value to model type
             m_type = allowed_types[m_type]
 
             # Map hub-unit --> model unit
@@ -98,4 +98,4 @@ class PostMeasurements(APIView):
                 unit=unit
             )
 
-        return Response({'Created measurements': count}, status=status.HTTP_201_CREATED)
+        return Response({'num_measurements': count}, status=status.HTTP_201_CREATED)
