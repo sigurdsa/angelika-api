@@ -14,7 +14,7 @@ class PermissionTests(AngelikaAPITestCase):
     def test_alarm_list_as_health_professional(self):
         self.force_authenticate('helselise')
 
-        first_patient = Patient.objects.all().first()
+        first_patient = Patient.objects.first()
         measurement = Measurement.objects.create(
             type='O',
             value=90.5,
@@ -41,7 +41,7 @@ class GetTests(AngelikaAPITestCase):
     def test_list_unfiltered(self):
         self.force_authenticate('helselise')
 
-        patient1 = Patient.objects.all().first()
+        patient1 = Patient.objects.first()
         measurement1 = Measurement.objects.create(
             type='O',
             value=90.5,
@@ -76,7 +76,7 @@ class GetTests(AngelikaAPITestCase):
     def test_list_filtered_by_patient(self):
         self.force_authenticate('helselise')
 
-        patient1 = Patient.objects.all().first()
+        patient1 = Patient.objects.first()
         measurement1 = Measurement.objects.create(
             type='O',
             value=90.5,

@@ -30,7 +30,7 @@ class PermissionTests(AngelikaAPITestCase):
 class PatchTests(AngelikaAPITestCase):
     def test_update_activity_access(self):
         self.force_authenticate('helselise')
-        first_patient = Patient.objects.all().first()
+        first_patient = Patient.objects.first()
         self.assertTrue(first_patient.activity_access)
 
         response = self.client.patch('/patients/' + str(first_patient.id) + '/', {
@@ -38,12 +38,12 @@ class PatchTests(AngelikaAPITestCase):
         })
         self.assertFalse(response.data['activity_access'])
 
-        first_patient = Patient.objects.all().first()
+        first_patient = Patient.objects.first()
         self.assertFalse(first_patient.activity_access)
 
     def test_add_next_of_kin(self):
         self.force_authenticate('helselise')
-        first_patient = Patient.objects.all().first()
+        first_patient = Patient.objects.first()
 
         self.client.patch(
             '/patients/' + str(first_patient.id) + '/',
@@ -68,7 +68,7 @@ class PatchTests(AngelikaAPITestCase):
 
     def test_update_next_of_kin_address(self):
         self.force_authenticate('helselise')
-        first_patient = Patient.objects.all().first()
+        first_patient = Patient.objects.first()
 
         next_of_kin = NextOfKin.objects.create(
             patient=first_patient,
@@ -102,7 +102,7 @@ class PatchTests(AngelikaAPITestCase):
 
     def test_reorder_next_of_kin(self):
         self.force_authenticate('helselise')
-        first_patient = Patient.objects.all().first()
+        first_patient = Patient.objects.first()
 
         next_of_kin1 = NextOfKin.objects.create(
             patient=first_patient,
@@ -159,7 +159,7 @@ class PatchTests(AngelikaAPITestCase):
 
     def test_remove_next_of_kin_address(self):
         self.force_authenticate('helselise')
-        first_patient = Patient.objects.all().first()
+        first_patient = Patient.objects.first()
 
         NextOfKin.objects.create(
             patient=first_patient,
@@ -183,7 +183,7 @@ class PatchTests(AngelikaAPITestCase):
 
     def test_update_and_reorder_and_remove_and_add_next_of_kin(self):
         self.force_authenticate('helselise')
-        first_patient = Patient.objects.all().first()
+        first_patient = Patient.objects.first()
 
         next_of_kin1 = NextOfKin.objects.create(
             patient=first_patient,
@@ -242,7 +242,7 @@ class PatchTests(AngelikaAPITestCase):
 
     def test_add_motivation_text(self):
         self.force_authenticate('helselise')
-        first_patient = Patient.objects.all().first()
+        first_patient = Patient.objects.first()
 
         self.client.patch(
             '/patients/' + str(first_patient.id) + '/',
@@ -264,7 +264,7 @@ class PatchTests(AngelikaAPITestCase):
 
     def test_update_motivation_text(self):
         self.force_authenticate('helselise')
-        first_patient = Patient.objects.all().first()
+        first_patient = Patient.objects.first()
 
         motivation_text = MotivationText.objects.create(
             patient=first_patient,
@@ -296,7 +296,7 @@ class PatchTests(AngelikaAPITestCase):
 
     def test_remove_motivation_text(self):
         self.force_authenticate('helselise')
-        first_patient = Patient.objects.all().first()
+        first_patient = Patient.objects.first()
 
         MotivationText.objects.create(
             patient=first_patient,
@@ -317,7 +317,7 @@ class PatchTests(AngelikaAPITestCase):
 
     def test_add_information_text(self):
         self.force_authenticate('helselise')
-        first_patient = Patient.objects.all().first()
+        first_patient = Patient.objects.first()
 
         self.client.patch(
             '/patients/' + str(first_patient.id) + '/',
@@ -339,7 +339,7 @@ class PatchTests(AngelikaAPITestCase):
 
     def test_update_information_text(self):
         self.force_authenticate('helselise')
-        first_patient = Patient.objects.all().first()
+        first_patient = Patient.objects.first()
 
         information_text = MotivationText.objects.create(
             patient=first_patient,
@@ -372,7 +372,7 @@ class PatchTests(AngelikaAPITestCase):
 
     def test_remove_information_text(self):
         self.force_authenticate('helselise')
-        first_patient = Patient.objects.all().first()
+        first_patient = Patient.objects.first()
 
         MotivationText.objects.create(
             patient=first_patient,
@@ -393,7 +393,7 @@ class PatchTests(AngelikaAPITestCase):
 
     def test_add_information_and_motivation_text(self):
         self.force_authenticate('helselise')
-        first_patient = Patient.objects.all().first()
+        first_patient = Patient.objects.first()
 
         self.client.patch(
             '/patients/' + str(first_patient.id) + '/',
@@ -468,8 +468,8 @@ class GetGraphDataTests(AngelikaAPITestCase):
     def test_graph_data_threshold_values(self):
         self.force_authenticate('helselise')
         self.create_patient('ystenes', 'Hallgeir', 'Ystenes')
-        patient1 = Patient.objects.all().first()
-        patient2 = Patient.objects.all().last()
+        patient1 = Patient.objects.first()
+        patient2 = Patient.objects.last()
 
         ThresholdValue.objects.create(
             patient=patient1,
@@ -526,8 +526,8 @@ class GetGraphDataTests(AngelikaAPITestCase):
     def test_graph_data_measurements(self):
         self.force_authenticate('helselise')
         self.create_patient('ystenes', 'Hallgeir', 'Ystenes')
-        patient1 = Patient.objects.all().first()
-        patient2 = Patient.objects.all().last()
+        patient1 = Patient.objects.first()
+        patient2 = Patient.objects.last()
 
         Measurement.objects.create(
             patient=patient1,
@@ -568,7 +568,7 @@ class GetGraphDataTests(AngelikaAPITestCase):
 
     def test_graph_data_alarms(self):
         self.force_authenticate('helselise')
-        patient1 = Patient.objects.all().first()
+        patient1 = Patient.objects.first()
 
         Measurement.objects.create(
             patient=patient1,
