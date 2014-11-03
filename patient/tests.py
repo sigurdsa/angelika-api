@@ -438,6 +438,12 @@ class GetGraphDataTests(AngelikaAPITestCase):
 
         Measurement.objects.create(
             patient=user.patient,
+            type='O',
+            time=timezone.now() - timedelta(days=8),  # Too old to be included in the view
+            value=58.0
+        )
+        Measurement.objects.create(
+            patient=user.patient,
             type='A',
             time=timezone.now(),
             value=58.0
@@ -548,6 +554,12 @@ class GetGraphDataTests(AngelikaAPITestCase):
             type='O',
             time=timezone.now(),
             value=600
+        )
+        Measurement.objects.create(
+            patient=patient1,
+            type='O',
+            time=timezone.now() - timedelta(days=370),  # Too old to be included in the view
+            value=58.0
         )
 
         response = self.client.get('/patients/' + str(patient1.id) + '/graph_data/?type=O')

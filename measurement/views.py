@@ -1,6 +1,3 @@
-from .models import Measurement
-from rest_framework import viewsets
-from graph.serializers import MeasurementGraphSeriesSerializer
 from rest_framework.exceptions import ParseError
 from api.permissions import IsPatient
 from rest_framework.permissions import IsAuthenticated
@@ -8,6 +5,8 @@ from rest_framework.views import APIView
 from django.core.exceptions import PermissionDenied
 from rest_framework.response import Response
 from patient.serializers import PatientGraphSeriesSerializer
+from django.utils import timezone
+from datetime import timedelta
 
 
 class CurrentPatientMeasurements(APIView):
@@ -32,6 +31,10 @@ class CurrentPatientMeasurements(APIView):
 
         serializer = PatientGraphSeriesSerializer(
             instance=patient,
-            context={'type': type, 'exclude_measurement_alarms': True}
+            context={
+                'type': type,
+                'exclude_measurement_alarms': True,
+                'min_time': timezone.now() - timedelta(days=7)
+            }
         )
         return Response(serializer.data)

@@ -205,7 +205,11 @@ class PatientGraphSeriesSerializer(serializers.ModelSerializer):
         fields = ('measurements', 'lower_threshold_values', 'upper_threshold_values')
 
     def get_measurements(self, obj):
-        measurements = Measurement.objects.filter(patient=obj, type=self.context['type'])
+        measurements = Measurement.objects.filter(
+            patient=obj,
+            type=self.context['type'],
+            time__gte=self.context['min_time']
+        )
         if 'exclude_measurement_alarms' in self.context and self.context['exclude_measurement_alarms']:
             serializer = MeasurementGraphSeriesSerializer(measurements, many=True)
             return serializer.data
