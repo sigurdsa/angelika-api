@@ -4,8 +4,6 @@ from rest_framework import routers
 from alarm import views as alarm_views
 from patient import views as patient_views
 from measurement import views as measurement_views
-from motivation_text import views as motivation_views
-from next_of_kin import views as next_of_kin_views
 
 router = routers.DefaultRouter()
 router.register(r'alarms', alarm_views.AlarmViewSet, base_name='Alarms')
