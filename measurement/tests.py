@@ -76,4 +76,3 @@ class PostMeasurementTests(AngelikaAPITestCase):
         }
         response = self.client.post('/post-measurements/', data, 'json')
         self.assertEqual(response.status_code, 400)
-

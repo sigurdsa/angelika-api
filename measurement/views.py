@@ -49,8 +49,17 @@ class CurrentPatientMeasurements(APIView):
 class PostMeasurements(APIView):
     permission_classes = (IsAuthenticated, IsHub, )
 
-    def post(self, request, format=None):
+    def __init__(self):
+        # Map hub-type --> model type
+        self.allowed_types = {"heart_rate": 'P', "spo2": 'O', "steps": 'A'}  # Maps value to model type
 
+        # Map hub-unit --> model unit
+        self.allowed_units = {"bpm": 'B', "percent": 'E', 'steps': 'S', "m": 'M', 'kcal': 'K', 's': 'S'}
+
+        # Filter out all activities but steps
+        self.ignored_types = ["elevation", "calories", "soft", "intense", "moderate", "distance"]
+
+    def post(self, request, format=None):
         hub_id = request.DATA.get("Observation").get("hub_id")
 
         try:
@@ -58,34 +67,23 @@ class PostMeasurements(APIView):
         except Patient.DoesNotExist:
             raise ParseError(detail='hub_id could not be mapped to patient')
 
-        count = 0  # How many measurements gets created?
+        num_measurements_created = 0  # How many measurements gets created?
 
         for measurement in request.DATA.get("Measurements"):
-
             date = measurement.get("date")
-            m_type = measurement.get("type")  # only steps should be used for now
+            m_type = measurement.get("type")
             unit = measurement.get("unit")
             value = measurement.get("value")
 
-            # Filter out all activities but steps
-            ignored_types = ["elevation", "calories", "soft", "intense", "moderate", "distance"]
-            if m_type in ignored_types:
+            if m_type in self.ignored_types:
                 continue
 
-            count += 1
+            num_measurements_created += 1
+            m_type = self.allowed_types[m_type]
+            unit = self.allowed_units[unit]
 
-            # Map hub-type --> model type
-            allowed_types = {"heart_rate": 'P', "spo2": 'O', "steps": 'A'}  # Maps value to model type
-            m_type = allowed_types[m_type]
-
-            # Map hub-unit --> model unit
-            allowed_units = {"bpm": 'B', "percent": 'E', 'steps': 'S', "m": 'M', 'kcal': 'K', 's': 'S'}
-            unit = allowed_units[unit]
-
-            # Convert time format
+            # Convert measurement datetime to timezone-aware format
             time = datetime.utcfromtimestamp(date)
-
-            # Time must be timezone-aware
             tz_aware_time = time.replace(tzinfo=pytz.UTC)
 
             Measurement.objects.create(
@@ -96,4 +94,4 @@ class PostMeasurements(APIView):
                 unit=unit
             )
 
-        return Response({'num_measurements': count}, status=status.HTTP_201_CREATED)
+        return Response({'num_measurements': num_measurements_created}, status=status.HTTP_201_CREATED)
