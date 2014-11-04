@@ -229,3 +229,89 @@ class PostMeasurementTests(AngelikaAPITestCase):
         self.assertEqual(response.status_code, 201)  # Created
         self.assertEqual(Measurement.objects.all().count(), 2)
         self.assertEqual(Alarm.objects.all().count(), 1)  # no new alarm has been created
+
+    def test_post_abnormal_low_measurements_multiple_patients(self):
+        hub_user1 = self.create_hub('hub1')
+        larsoverhaug = Patient.objects.get(user__username='larsoverhaug')
+        larsoverhaug.hub = hub_user1
+        larsoverhaug.save()
+
+        hub_user2 = self.create_hub('hub2')
+        kristin = self.create_patient('kristin', 'Kristin Hegine', 'Taraldsen')
+        kristin.hub = hub_user2
+        kristin.save()
+
+        self.force_authenticate('hub1')
+
+        threshold_time = datetime.utcfromtimestamp(1414900000).replace(tzinfo=UTC)
+        ThresholdValue.objects.create(
+            value=49,
+            patient=larsoverhaug,
+            type='P',
+            is_upper_threshold=False,
+            time=threshold_time
+        )
+        ThresholdValue.objects.create(
+            value=165,
+            patient=larsoverhaug,
+            type='P',
+            is_upper_threshold=False,
+            time=threshold_time
+        )
+
+        ThresholdValue.objects.create(
+            value=46,
+            patient=kristin,
+            type='P',
+            is_upper_threshold=False,
+            time=threshold_time
+        )
+        ThresholdValue.objects.create(
+            value=160,
+            patient=kristin,
+            type='P',
+            is_upper_threshold=False,
+            time=threshold_time
+        )
+
+        data1 = {
+            "Measurements": [
+                {
+                    "date": 1414972800,
+                    "type": "heart_rate",
+                    "unit": "bpm",
+                    "value": 42
+                }
+            ],
+            "Observation": {
+                "hub_id": "hub1"
+            }
+        }
+
+        response = self.client.post('/post-measurements/', data1, 'json')
+
+        self.assertEqual(response.status_code, 201)  # Created
+        self.assertEqual(Measurement.objects.all().count(), 1)
+        self.assertEqual(Alarm.objects.all().count(), 1)
+
+        self.force_authenticate('hub2')
+
+        data2 = {
+            "Measurements": [
+                {
+                    "date": 1414972950,
+                    "type": "heart_rate",
+                    "unit": "bpm",
+                    "value": 45
+                }
+            ],
+            "Observation": {
+                "hub_id": "hub2"
+            }
+        }
+
+        response = self.client.post('/post-measurements/', data2, 'json')
+
+        self.assertEqual(response.status_code, 201)  # Created
+        self.assertEqual(Measurement.objects.all().count(), 2)
+        self.assertEqual(Alarm.objects.all().count(), 2)  # another alarm has been created
