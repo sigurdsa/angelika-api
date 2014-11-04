@@ -11,8 +11,8 @@ class MotivationText(models.Model):
 
     def __unicode__(self):
         return smart_unicode(
-            "Motivational text for "
-            + self.patient.user.first_name + " " + self.patient.user.last_name
+            ("InformationText" if self.type == 'I' else 'MotivationText')
+            + " for " + self.patient.user.get_full_name()
             + " created at " + str(self.time_created)
         )
 
