@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='measurement',
             name='type',
-            field=models.IntegerField(choices=[(1, b'Activity'), (2, b'O2'), (3, b'Pulse'), (4, b'Temperature')]),
+            field=models.CharField(max_length=1, choices=[(b'A', b'Activity'), (b'O', b'O2'), (b'P', b'Pulse'), (b'T', b'Temperature')]),
         ),
     ]
