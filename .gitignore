@@ -4,3 +4,4 @@ venv/*
 .idea
 *.iml
 static/*
+api/settings/local.py
