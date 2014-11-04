@@ -11,8 +11,9 @@ from patient.models import Patient
 from patient.serializers import PatientGraphSeriesSerializer
 from django.utils import timezone
 from datetime import timedelta
-
-import pytz
+from threshold_value.models import ThresholdValue
+from pytz import UTC
+from alarm.models import Alarm
 
 
 class CurrentPatientMeasurements(APIView):
@@ -67,7 +68,8 @@ class PostMeasurements(APIView):
         except Patient.DoesNotExist:
             raise ParseError(detail='hub_id could not be mapped to patient')
 
-        num_measurements_created = 0  # How many measurements gets created?
+        num_measurements_created = 0
+        num_alarms_created = 0
 
         for measurement in request.DATA.get("Measurements"):
             date = measurement.get("date")
@@ -78,20 +80,60 @@ class PostMeasurements(APIView):
             if m_type in self.ignored_types:
                 continue
 
-            num_measurements_created += 1
             m_type = self.allowed_types[m_type]
             unit = self.allowed_units[unit]
 
             # Convert measurement datetime to timezone-aware format
-            time = datetime.utcfromtimestamp(date)
-            tz_aware_time = time.replace(tzinfo=pytz.UTC)
+            time = datetime.utcfromtimestamp(date).replace(tzinfo=UTC)
 
-            Measurement.objects.create(
+            measurement = Measurement.objects.create(
                 patient=patient,
-                time=tz_aware_time,
+                time=time,
                 type=m_type,
                 value=value,
                 unit=unit
             )
 
-        return Response({'num_measurements': num_measurements_created}, status=status.HTTP_201_CREATED)
+            num_measurements_created += 1
+            if self.create_alert_if_abnormal(measurement):
+                num_alarms_created += 1
+
+        status_code = status.HTTP_200_OK
+        if num_measurements_created > 0 or num_alarms_created > 0:
+            status_code = status.HTTP_201_CREATED
+
+        return Response(
+            {
+                'num_measurements_created': num_measurements_created,
+                'num_alerts_created': num_alarms_created
+            },
+            status=status_code
+        )
+
+    def create_alert_if_abnormal(self, measurement):
+        lower_threshold_value = ThresholdValue.objects.filter(
+            patient=measurement.patient,
+            type=measurement.type,
+            is_upper_threshold=False,
+            time__gte=measurement.time
+        ).first()
+
+        upper_threshold_value = ThresholdValue.objects.filter(
+            patient=measurement.patient,
+            type=measurement.type,
+            is_upper_threshold=False,
+            time__gte=measurement.time
+        ).first()
+
+        if (lower_threshold_value and measurement.value < lower_threshold_value.value)\
+                or (upper_threshold_value and measurement.value > upper_threshold_value.value):
+            # check if there's already an untreated alarm for this incident
+            recent_untreated_alarm = Alarm.objects.filter(
+                measurement__patient=measurement.patient,
+                measurement__type=measurement.type,
+                is_treated=False
+            ).first()
+            if not recent_untreated_alarm:
+                return Alarm.objects.create(measurement=measurement)
+
+        return None
