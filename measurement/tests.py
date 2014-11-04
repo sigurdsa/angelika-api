@@ -5,16 +5,13 @@ from measurement.models import Measurement
 
 
 class PostMeasurementTests(AngelikaAPITestCase):
-    def test_post_one_measurement(self):
-        hub_group = Group.objects.create(name='hubs')
-        hub_user = User.objects.create_user('hub1', 'hub1@hotmail.com', 'test')
-        hub_user.save()
-        hub_user.groups.add(hub_group)
 
+
+    def test_post_ignored_measurements(self):
+        hub_user = self.create_hub('hub1')
         larsoverhaug = Patient.objects.get(user__username='larsoverhaug')
         larsoverhaug.hub = hub_user
         larsoverhaug.save()
-
         self.force_authenticate('hub1')
 
         data = {
@@ -56,4 +53,27 @@ class PostMeasurementTests(AngelikaAPITestCase):
     def test_post_when_not_authenticated(self):
         response = self.client.post('/post-measurements/', {}, 'json')
         self.assertEqual(response.status_code, 401)
+
+    def test_post_bad_hub_id(self):
+        hub_user = self.create_hub('hub1')
+        larsoverhaug = Patient.objects.get(user__username='larsoverhaug')
+        larsoverhaug.hub = hub_user
+        larsoverhaug.save()
+        self.force_authenticate('hub1')
+
+        data = {
+            "Measurements": [
+                {
+                    "date": 1414972800,
+                    "type": "steps",
+                    "unit": "steps",
+                    "value": 1067
+                }
+            ],
+            "Observation": {
+                "hub_id": "dsfkjhdsfkjhdsf"
+            }
+        }
+        response = self.client.post('/post-measurements/', data, 'json')
+        self.assertEqual(response.status_code, 400)
 

@@ -53,12 +53,10 @@ class PostMeasurements(APIView):
 
         hub_id = request.DATA.get("Observation").get("hub_id")
 
-        patient = Patient.objects.get(hub__username=hub_id)
-
-        if patient:
-            patient_id = patient.id
-        else:
-            return Response({"hub_id could not be mapped to patient": -1}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            patient = Patient.objects.get(hub__username=hub_id)
+        except Patient.DoesNotExist:
+            raise ParseError(detail='hub_id could not be mapped to patient')
 
         count = 0  # How many measurements gets created?
 
@@ -91,7 +89,7 @@ class PostMeasurements(APIView):
             tz_aware_time = time.replace(tzinfo=pytz.UTC)
 
             Measurement.objects.create(
-                patient_id=patient_id,
+                patient=patient,
                 time=tz_aware_time,
                 type=m_type,
                 value=value,

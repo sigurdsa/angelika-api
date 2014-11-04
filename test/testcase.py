@@ -36,6 +36,14 @@ class AngelikaAPITestCase(APITestCase):
 
         return patient
 
+    def create_hub(self, username):
+        hub_group, created = Group.objects.get_or_create(name='hubs')
+        hub_user = User.objects.create_user(username, username + '@hotmail.com', 'test')
+        hub_user.save()
+        hub_user.groups.add(hub_group)
+
+        return hub_user
+
     def force_authenticate(self, username):
         user = User.objects.get(username=username)
         self.client.force_authenticate(user=user)
