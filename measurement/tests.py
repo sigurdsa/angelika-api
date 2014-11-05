@@ -5,6 +5,7 @@ from threshold_value.models import ThresholdValue
 from pytz import UTC
 from datetime import datetime
 from alarm.models import Alarm
+import time
 
 
 class PostMeasurementTests(AngelikaAPITestCase):
@@ -86,26 +87,24 @@ class PostMeasurementTests(AngelikaAPITestCase):
         larsoverhaug.save()
         self.force_authenticate('hub1')
 
-        threshold_time = datetime.utcfromtimestamp(1414900000).replace(tzinfo=UTC)
         lower_threshold_value = ThresholdValue.objects.create(
             value=49,
             patient=larsoverhaug,
             type='P',
             is_upper_threshold=False,
-            time=threshold_time
         )
         upper_threshold_value = ThresholdValue.objects.create(
             value=165,
             patient=larsoverhaug,
             type='P',
             is_upper_threshold=False,
-            time=threshold_time
         )
 
+        measurement_time = int(time.time()) + 10000
         data = {
             "Measurements": [
                 {
-                    "date": 1414972800,
+                    "date": measurement_time,
                     "type": "heart_rate",
                     "unit": "bpm",
                     "value": 42
@@ -130,26 +129,24 @@ class PostMeasurementTests(AngelikaAPITestCase):
         larsoverhaug.save()
         self.force_authenticate('hub1')
 
-        threshold_time = datetime.utcfromtimestamp(1414900000).replace(tzinfo=UTC)
-        lower_threshold_value = ThresholdValue.objects.create(
+        ThresholdValue.objects.create(
             value=49,
             patient=larsoverhaug,
             type='P',
             is_upper_threshold=False,
-            time=threshold_time
         )
-        upper_threshold_value = ThresholdValue.objects.create(
+        ThresholdValue.objects.create(
             value=165,
             patient=larsoverhaug,
             type='P',
             is_upper_threshold=False,
-            time=threshold_time
         )
 
+        measurement_time = int(time.time()) + 10000
         data = {
             "Measurements": [
                 {
-                    "date": 1414972800,
+                    "date": measurement_time,
                     "type": "heart_rate",
                     "unit": "bpm",
                     "value": 180
@@ -174,26 +171,24 @@ class PostMeasurementTests(AngelikaAPITestCase):
         larsoverhaug.save()
         self.force_authenticate('hub1')
 
-        threshold_time = datetime.utcfromtimestamp(1414900000).replace(tzinfo=UTC)
         lower_threshold_value = ThresholdValue.objects.create(
             value=49,
             patient=larsoverhaug,
             type='P',
             is_upper_threshold=False,
-            time=threshold_time
         )
         upper_threshold_value = ThresholdValue.objects.create(
             value=165,
             patient=larsoverhaug,
             type='P',
             is_upper_threshold=False,
-            time=threshold_time
         )
 
+        measurement_time = int(time.time()) + 10000
         data = {
             "Measurements": [
                 {
-                    "date": 1414972800,
+                    "date": measurement_time,
                     "type": "heart_rate",
                     "unit": "bpm",
                     "value": 42
@@ -213,7 +208,7 @@ class PostMeasurementTests(AngelikaAPITestCase):
         data = {
             "Measurements": [
                 {
-                    "date": 1414972900,
+                    "date": measurement_time + 500,
                     "type": "heart_rate",
                     "unit": "bpm",
                     "value": 41
@@ -243,20 +238,17 @@ class PostMeasurementTests(AngelikaAPITestCase):
 
         self.force_authenticate('hub1')
 
-        threshold_time = datetime.utcfromtimestamp(1414900000).replace(tzinfo=UTC)
         ThresholdValue.objects.create(
             value=49,
             patient=larsoverhaug,
             type='P',
             is_upper_threshold=False,
-            time=threshold_time
         )
         ThresholdValue.objects.create(
             value=165,
             patient=larsoverhaug,
             type='P',
             is_upper_threshold=False,
-            time=threshold_time
         )
 
         ThresholdValue.objects.create(
@@ -264,20 +256,19 @@ class PostMeasurementTests(AngelikaAPITestCase):
             patient=kristin,
             type='P',
             is_upper_threshold=False,
-            time=threshold_time
         )
         ThresholdValue.objects.create(
             value=160,
             patient=kristin,
             type='P',
             is_upper_threshold=False,
-            time=threshold_time
         )
 
+        measurement_time = int(time.time()) + 10000
         data1 = {
             "Measurements": [
                 {
-                    "date": 1414972800,
+                    "date": measurement_time,
                     "type": "heart_rate",
                     "unit": "bpm",
                     "value": 42
@@ -299,7 +290,7 @@ class PostMeasurementTests(AngelikaAPITestCase):
         data2 = {
             "Measurements": [
                 {
-                    "date": 1414972950,
+                    "date": measurement_time + 50,
                     "type": "heart_rate",
                     "unit": "bpm",
                     "value": 45

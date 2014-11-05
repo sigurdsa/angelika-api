@@ -115,15 +115,15 @@ class PostMeasurements(APIView):
             patient=measurement.patient,
             type=measurement.type,
             is_upper_threshold=False,
-            time__gte=measurement.time
-        ).first()
+            time__lte=measurement.time
+        ).last()
 
         upper_threshold_value = ThresholdValue.objects.filter(
             patient=measurement.patient,
             type=measurement.type,
             is_upper_threshold=False,
-            time__gte=measurement.time
-        ).first()
+            time__lte=measurement.time
+        ).last()
 
         if (lower_threshold_value and measurement.value < lower_threshold_value.value)\
                 or (upper_threshold_value and measurement.value > upper_threshold_value.value):
