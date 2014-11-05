@@ -3,7 +3,6 @@ from rest_framework import viewsets
 from .serializers import AlarmSerializer, PatientAlarmSerializer
 from api.permissions import IsHealthProfessional
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import ParseError
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 from motivation_text.models import MotivationText
@@ -26,11 +25,11 @@ class AlarmViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         patient_id = self.request.QUERY_PARAMS.get('patient_id', None)
         if patient_id is None:
-            return Alarm.objects.all()
+            return Alarm.objects.all().select_related('measurement__patient__user')
         if not patient_id.isdigit():
             raise ParseError(detail="patient_id is not numeric")
 
-        return Alarm.objects.filter(measurement__patient_id=patient_id)
+        return Alarm.objects.filter(measurement__patient_id=patient_id).select_related('measurement')
 
     @detail_route(methods=['post'])
     def handle(self, request, pk=None):
@@ -55,4 +54,3 @@ class AlarmViewSet(viewsets.ModelViewSet):
 
         except KeyError:
             raise ParseError()
-
