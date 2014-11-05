@@ -36,17 +36,18 @@ class AlarmViewSet(viewsets.ModelViewSet):
     def handle(self, request, pk=None):
         try:
             alarm_dict = request.DATA['alarm']
-            motivation_text = request.DATA['motivation_text']
+            motivation_text_dict = request.DATA['motivation_text']
 
             alarm = self.get_object()
             alarm.is_treated = alarm_dict['is_treated']
             alarm.treated_text = alarm_dict['treated_text']
             alarm.save()
 
-            if motivation_text:
-                MotivationText.objects.create(
+            motivation_text = None
+            if 'text' in motivation_text_dict and motivation_text_dict['text']:
+                motivation_text = MotivationText.objects.create(
                     patient=alarm.measurement.patient,
-                    text=motivation_text
+                    text=motivation_text_dict['text']
                 )
 
             serializer = PatientAlarmSerializer(instance=alarm)
