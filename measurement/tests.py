@@ -230,7 +230,7 @@ class PostMeasurementTests(AngelikaAPITestCase):
         larsoverhaug.save()
 
         hub_user2 = self.create_hub('hub2')
-        kristin = self.create_patient('kristin', 'Kristin Hegine', 'Taraldsen')
+        kristin = self.create_patient('kristin', 'Kristin Hegine', 'Taraldsen', '08105534879')
         kristin.hub = hub_user2
         kristin.save()
 

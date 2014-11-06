@@ -54,7 +54,7 @@ class GetTests(AngelikaAPITestCase):
             time_created=timezone.now()
         )
 
-        patient2 = self.create_patient('karinordmann', 'Kari', 'Nordmann')
+        patient2 = self.create_patient('karinordmann', 'Kari', 'Nordmann', '02105534875')
         measurement2 = Measurement.objects.create(
             type='P',
             value=63,
@@ -89,7 +89,7 @@ class GetTests(AngelikaAPITestCase):
             time_created=timezone.now()
         )
 
-        patient2 = self.create_patient('karinordmann', 'Kari', 'Nordmann')
+        patient2 = self.create_patient('karinordmann', 'Kari', 'Nordmann', '02105534879')
         measurement2 = Measurement.objects.create(
             type='O',
             value=96.5,

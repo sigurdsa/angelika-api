@@ -468,7 +468,7 @@ class GetGraphDataTests(AngelikaAPITestCase):
 
     def test_graph_data_threshold_values(self):
         self.force_authenticate('helselise')
-        self.create_patient('ystenes', 'Hallgeir', 'Ystenes')
+        self.create_patient('ystenes', 'Hallgeir', 'Ystenes', '02094623456')
         patient1 = Patient.objects.first()
         patient2 = Patient.objects.last()
 
@@ -526,7 +526,7 @@ class GetGraphDataTests(AngelikaAPITestCase):
 
     def test_graph_data_measurements(self):
         self.force_authenticate('helselise')
-        self.create_patient('ystenes', 'Hallgeir', 'Ystenes')
+        self.create_patient('ystenes', 'Hallgeir', 'Ystenes', '02094523456')
         patient1 = Patient.objects.first()
         patient2 = Patient.objects.last()
 
@@ -715,3 +715,22 @@ class PostTests(AngelikaAPITestCase):
         self.assertEqual(NextOfKin.objects.count(), 0)
         self.assertEqual(MotivationText.objects.count(), 0)
         self.assertEqual(ThresholdValue.objects.count(), 0)
+
+    def test_unique_national_identification_number(self):
+        self.force_authenticate('helselise')
+
+        data = {
+            'user': {
+                'first_name': 'Bent',
+                'last_name': 'Hanskemann'
+            },
+            'national_identification_number': "05074576384",
+        }
+
+        response = self.client.post('/patients/', data, 'json')
+
+        self.assertEqual(response.status_code, 201)  # Created
+        self.assertEqual(Patient.objects.last().national_identification_number, "05074576384")
+
+        response2 = self.client.post('/patients/', data, 'json')
+        self.assertEqual(response2.status_code, 409)  # Conflict

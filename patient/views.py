@@ -18,6 +18,7 @@ from threshold_value.models import ThresholdValue
 from django.contrib.auth.models import User, Group
 from uuid import uuid4
 from rest_framework import status
+from django.db import IntegrityError
 
 
 class PatientViewSet(viewsets.ModelViewSet):
@@ -32,6 +33,13 @@ class PatientViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         patient_data = request.DATA
+
+        is_duplicate = Patient.objects.filter(
+            national_identification_number=patient_data['national_identification_number']
+        ).exists()
+        if is_duplicate:
+            return Response({'error': 'duplicate_national_identification_number'}, status=status.HTTP_409_CONFLICT)
+
         user_data = patient_data.pop('user', None)
         if user_data is None:
             raise ParseError(detail='User is not specified')

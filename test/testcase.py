@@ -12,9 +12,9 @@ class AngelikaAPITestCase(APITestCase):
         health_professional_user.save()
         health_professional_user.groups.add(health_professional_group)
 
-        self.create_patient('larsoverhaug', 'Lars', 'Overhaug')
+        self.create_patient('larsoverhaug', 'Lars', 'Overhaug', '03023576487')
 
-    def create_patient(self, username, first_name, last_name):
+    def create_patient(self, username, first_name, last_name, national_identification_number):
         patient_user = User.objects.create_user(username, username + '@hotmail.com', 'test')
         patient_user.first_name = first_name
         patient_user.last_name = last_name
@@ -22,7 +22,7 @@ class AngelikaAPITestCase(APITestCase):
         patient_user.groups.add(Group.objects.get(name='patients'))
         patient = Patient.objects.create(
             user=patient_user,
-            national_identification_number='02094523456',
+            national_identification_number=national_identification_number,
             phone_number='45763984',
             address='arbeiderveien',
             zip_code='0030',
