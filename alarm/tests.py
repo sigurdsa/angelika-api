@@ -138,7 +138,9 @@ class PostTests(AngelikaAPITestCase):
                     'is_treated': True,
                     'treated_text': 'Ensom',
                 },
-                'motivation_text': 'Ta en kaffe med Ole-Petter'
+                'motivation_text': {
+                    'text': 'Ta en kaffe med Ole-Petter'
+                }
             },
             'json'
         )
