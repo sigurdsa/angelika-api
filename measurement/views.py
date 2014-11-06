@@ -86,15 +86,29 @@ class PostMeasurements(APIView):
             # Convert measurement datetime to timezone-aware format
             time = datetime.utcfromtimestamp(date).replace(tzinfo=UTC)
 
-            measurement = Measurement.objects.create(
-                patient=patient,
-                time=time,
-                type=m_type,
-                value=value,
-                unit=unit
-            )
+            measurement = None
+            if m_type == 'A':
+                measurement = Measurement.objects.filter(
+                    patient=patient,
+                    time=time,
+                    type=m_type,
+                    unit=unit
+                ).first()
 
-            num_measurements_created += 1
+            if measurement:  # update existing measurement instead of creating a new one
+                if measurement.value < value:
+                    measurement.value = value
+                    measurement.save()
+            else:
+                measurement = Measurement.objects.create(
+                    patient=patient,
+                    time=time,
+                    type=m_type,
+                    value=value,
+                    unit=unit
+                )
+                num_measurements_created += 1
+
             if self.create_alert_if_abnormal(measurement):
                 num_alarms_created += 1
 

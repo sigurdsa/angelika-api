@@ -42,16 +42,16 @@ class PostMeasurementTests(AngelikaAPITestCase):
             }
         }
 
-        self.assertEqual(Measurement.objects.all().count(), 0)  # Nothing is created yet
+        self.assertEqual(Measurement.objects.count(), 0)  # Nothing is created yet
 
         response = self.client.post('/post-measurements/', data, 'json')
 
         self.assertEqual(response.status_code, 201)  # Created
         self.assertEqual(response.data["num_measurements_created"], 1)  # One object created
-        self.assertEqual(Measurement.objects.all().count(), 1)  # One object created
+        self.assertEqual(Measurement.objects.count(), 1)  # One object created
         self.assertAlmostEqual(Measurement.objects.first().value, 1067.0)  # Correct no of steps
         self.assertEqual(Measurement.objects.first().patient, larsoverhaug)  # Correct patient
-        self.assertEqual(Alarm.objects.all().count(), 0)
+        self.assertEqual(Alarm.objects.count(), 0)
 
     def test_post_when_not_authenticated(self):
         response = self.client.post('/post-measurements/', {}, 'json')
@@ -118,8 +118,8 @@ class PostMeasurementTests(AngelikaAPITestCase):
         response = self.client.post('/post-measurements/', data, 'json')
 
         self.assertEqual(response.status_code, 201)  # Created
-        self.assertEqual(Measurement.objects.all().count(), 1)
-        self.assertEqual(Alarm.objects.all().count(), 1)
+        self.assertEqual(Measurement.objects.count(), 1)
+        self.assertEqual(Alarm.objects.count(), 1)
         self.assertEqual(Alarm.objects.first().measurement.pk, Measurement.objects.first().pk)
 
     def test_post_abnormal_high_measurements(self):
@@ -160,8 +160,8 @@ class PostMeasurementTests(AngelikaAPITestCase):
         response = self.client.post('/post-measurements/', data, 'json')
 
         self.assertEqual(response.status_code, 201)  # Created
-        self.assertEqual(Measurement.objects.all().count(), 1)
-        self.assertEqual(Alarm.objects.all().count(), 1)
+        self.assertEqual(Measurement.objects.count(), 1)
+        self.assertEqual(Alarm.objects.count(), 1)
         self.assertEqual(Alarm.objects.first().measurement.pk, Measurement.objects.first().pk)
 
     def test_post_abnormal_low_measurements_repeatedly(self):
@@ -202,8 +202,8 @@ class PostMeasurementTests(AngelikaAPITestCase):
         response = self.client.post('/post-measurements/', data, 'json')
 
         self.assertEqual(response.status_code, 201)  # Created
-        self.assertEqual(Measurement.objects.all().count(), 1)
-        self.assertEqual(Alarm.objects.all().count(), 1)
+        self.assertEqual(Measurement.objects.count(), 1)
+        self.assertEqual(Alarm.objects.count(), 1)
 
         data = {
             "Measurements": [
@@ -222,8 +222,8 @@ class PostMeasurementTests(AngelikaAPITestCase):
         response = self.client.post('/post-measurements/', data, 'json')
 
         self.assertEqual(response.status_code, 201)  # Created
-        self.assertEqual(Measurement.objects.all().count(), 2)
-        self.assertEqual(Alarm.objects.all().count(), 1)  # no new alarm has been created
+        self.assertEqual(Measurement.objects.count(), 2)
+        self.assertEqual(Alarm.objects.count(), 1)  # no new alarm has been created
 
     def test_post_abnormal_low_measurements_multiple_patients(self):
         hub_user1 = self.create_hub('hub1')
@@ -282,8 +282,8 @@ class PostMeasurementTests(AngelikaAPITestCase):
         response = self.client.post('/post-measurements/', data1, 'json')
 
         self.assertEqual(response.status_code, 201)  # Created
-        self.assertEqual(Measurement.objects.all().count(), 1)
-        self.assertEqual(Alarm.objects.all().count(), 1)
+        self.assertEqual(Measurement.objects.count(), 1)
+        self.assertEqual(Alarm.objects.count(), 1)
 
         self.force_authenticate('hub2')
 
@@ -304,5 +304,41 @@ class PostMeasurementTests(AngelikaAPITestCase):
         response = self.client.post('/post-measurements/', data2, 'json')
 
         self.assertEqual(response.status_code, 201)  # Created
-        self.assertEqual(Measurement.objects.all().count(), 2)
-        self.assertEqual(Alarm.objects.all().count(), 2)  # another alarm has been created
+        self.assertEqual(Measurement.objects.count(), 2)
+        self.assertEqual(Alarm.objects.count(), 2)  # another alarm has been created
+
+
+    def test_update_daily_activity_measurement(self):
+        hub_user = self.create_hub('hub1')
+        larsoverhaug = Patient.objects.get(user__username='larsoverhaug')
+        larsoverhaug.hub = hub_user
+        larsoverhaug.save()
+        self.force_authenticate('hub1')
+
+        measurement_time = int(time.time())
+        data = {
+            "Measurements": [
+                {
+                    "date": measurement_time,
+                    "type": "steps",
+                    "unit": "steps",
+                    "value": 656
+                }
+            ],
+            "Observation": {
+                "hub_id": "hub1"
+            }
+        }
+
+        response = self.client.post('/post-measurements/', data, 'json')
+
+        self.assertEqual(response.status_code, 201)  # Created
+        self.assertEqual(Measurement.objects.count(), 1)
+
+        data['Measurements'][0]['value'] = 890
+
+        response = self.client.post('/post-measurements/', data, 'json')
+
+        self.assertEqual(response.status_code, 200)  # OK
+        self.assertEqual(Measurement.objects.count(), 1)
+        self.assertEqual(Measurement.objects.first().value, 890)
