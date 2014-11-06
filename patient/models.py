@@ -33,7 +33,7 @@ class Patient(models.Model):
     )
 
     def __unicode__(self):
-        name = self.user.first_name + " " + self.user.last_name
+        name = self.user.get_full_name()
         if len(name) <= 2:
             name = self.user.username
         return smart_unicode(name)

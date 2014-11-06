@@ -18,4 +18,7 @@ class CustomPatientForm(forms.ModelForm):
 class PatientAdmin(admin.ModelAdmin):
     form = CustomPatientForm
 
+    def get_queryset(self, request):
+        return super(PatientAdmin, self).get_queryset(request).select_related('user')
+
 admin.site.register(Patient, PatientAdmin)
