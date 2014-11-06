@@ -4,6 +4,7 @@ from threshold_value.models import ThresholdValue
 from calendar import timegm
 from alarm.models import Alarm
 
+
 class GraphSeriesSerializer(serializers.ModelSerializer):
     x = serializers.SerializerMethodField('get_time')
     y = serializers.SerializerMethodField('get_value')

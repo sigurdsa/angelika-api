@@ -111,6 +111,9 @@ class PostMeasurements(APIView):
         )
 
     def create_alert_if_abnormal(self, measurement):
+        if not measurement.type in ['O', 'P', 'T']:
+            return None
+
         lower_threshold_value = ThresholdValue.objects.filter(
             patient=measurement.patient,
             type=measurement.type,
