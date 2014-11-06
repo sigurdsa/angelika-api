@@ -9,6 +9,7 @@ class Patient(models.Model):
     national_identification_number = models.CharField(
         default="",
         max_length=11,
+        unique=True,
         help_text="A number consisting of date of birth + national id, (11 digits)"
     )
     phone_number = models.CharField(max_length=14, blank=True, null=True)
