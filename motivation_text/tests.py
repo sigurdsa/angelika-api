@@ -12,6 +12,7 @@ class TestMotivation(AngelikaAPITestCase):
             text='HEI'
         )
         self.assertEqual(motivation_text.text, 'HEI')
+
     def test_current_information(self):
         self.force_authenticate('larsoverhaug')
         first_patient = Patient.objects.first()

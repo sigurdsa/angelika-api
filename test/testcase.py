@@ -4,7 +4,6 @@ from patient.models import Patient
 
 
 class AngelikaAPITestCase(APITestCase):
-
     def setUp(self):
         Group.objects.create(name='patients')
 

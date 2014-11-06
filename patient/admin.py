@@ -3,6 +3,7 @@ from django.contrib.auth.models import Group
 from .models import Patient
 from django import forms
 
+
 class CustomPatientForm(forms.ModelForm):
     class Meta:
         model = Patient

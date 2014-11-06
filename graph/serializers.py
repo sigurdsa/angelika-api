@@ -44,6 +44,7 @@ class ThresholdValueGraphSeriesSerializer(GraphSeriesSerializer):
     class Meta(GraphSeriesSerializer.Meta):
         model = ThresholdValue
 
+
 class SimpleAlarmSerializer(serializers.ModelSerializer):
     class Meta:
         model = Alarm

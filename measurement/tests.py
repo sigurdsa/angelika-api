@@ -2,8 +2,6 @@ from test.testcase import AngelikaAPITestCase
 from patient.models import Patient
 from measurement.models import Measurement
 from threshold_value.models import ThresholdValue
-from pytz import UTC
-from datetime import datetime
 from alarm.models import Alarm
 import time
 
