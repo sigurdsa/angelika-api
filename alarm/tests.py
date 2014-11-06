@@ -148,7 +148,7 @@ class PostTests(AngelikaAPITestCase):
         self.assertEqual(response.status_code, 200)  # OK
         self.assertEqual(response.data['treated_text'], 'Ensom')
         self.assertEqual(response.data['is_treated'], True)
-        self.assertEqual(MotivationText.objects.all().count(), 1)
+        self.assertEqual(MotivationText.objects.count(), 1)
 
     def test_handle_without_motivation_text(self):
         patient1 = Patient.objects.first()
@@ -176,4 +176,4 @@ class PostTests(AngelikaAPITestCase):
             'json'
         )
 
-        self.assertEqual(MotivationText.objects.all().count(), 0)
+        self.assertEqual(MotivationText.objects.count(), 0)

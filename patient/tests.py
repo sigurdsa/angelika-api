@@ -7,6 +7,7 @@ from alarm.models import Alarm
 from django.utils import timezone
 from datetime import timedelta
 from threshold_value.models import ThresholdValue
+from django.contrib.auth.models import User
 
 
 class PermissionTests(AngelikaAPITestCase):
@@ -624,3 +625,93 @@ class CurrentPatientTests(AngelikaAPITestCase):
             type='C',  # CALL_ME_REQUEST
         ).count()
         self.assertEqual(num_requested, 1)
+
+
+class PostTests(AngelikaAPITestCase):
+    def test_create_patient(self):
+        self.force_authenticate('helselise')
+
+        response = self.client.post(
+            '/patients/',
+            {
+                'id': None,
+
+                'user': {
+                    'first_name': 'Per',
+                    'last_name': 'Sprellemann'
+                },
+
+                'national_identification_number': "13057675847",
+                'phone_number': '95764837',
+                'address': 'Arbeiderveien 4',
+                'zip_code': '0350',
+                'city': 'Oslo',
+                'o2_max': 100,
+                'o2_min': 60,
+                'pulse_max': 180,
+                'pulse_min': 50,
+                'temperature_max': 42,
+                'temperature_min': 35,
+                'activity_access': True,
+                'o2_access': False,
+                'pulse_access': False,
+                'temperature_access': False,
+
+                'next_of_kin': [
+                    {
+                        'full_name': 'Harald Sprellemann',
+                        'address': 'Eventyrskogen',
+                        'phone_number': '453548598',
+                        'relation': 'Bror'
+                    },
+                    {
+                        'full_name': 'Trond Sprellemann',
+                        'address': 'Eventyrskogen',
+                        'phone_number': 'har ikke tlf',
+                        'relation': 'Far'
+                    }
+                ],
+                'motivational_texts': [
+                    {'text': 'Det er sol i dag! :)'}
+                ],
+                'information_texts': [
+                    {'text': 'Info skal inn her'}
+                ]
+            },
+            'json'
+        )
+
+        self.assertEqual(response.status_code, 201)  # Created
+        self.assertTrue('user' in response.data)
+        self.assertEqual(User.objects.last().last_name, "Sprellemann")
+        self.assertEqual(Patient.objects.last().national_identification_number, "13057675847")
+        self.assertEqual(NextOfKin.objects.count(), 2)
+        self.assertEqual(NextOfKin.objects.last().full_name, 'Trond Sprellemann')
+        self.assertEqual(MotivationText.objects.count(), 2)
+        self.assertEqual(MotivationText.objects.filter(type='M').first().text, 'Det er sol i dag! :)')
+        self.assertEqual(MotivationText.objects.filter(type='I').first().text, 'Info skal inn her')
+        self.assertEqual(ThresholdValue.objects.count(), 6)
+
+    def test_create_patient_with_minimum_amount_of_data(self):
+        self.force_authenticate('helselise')
+
+        response = self.client.post(
+            '/patients/',
+            {
+                'user': {
+                    'first_name': 'Bent',
+                    'last_name': 'Hanskemann'
+                },
+
+                'national_identification_number': "05074576384",
+            },
+            'json'
+        )
+
+        self.assertEqual(response.status_code, 201)  # Created
+        self.assertTrue('user' in response.data)
+        self.assertEqual(User.objects.last().last_name, "Hanskemann")
+        self.assertEqual(Patient.objects.last().national_identification_number, "05074576384")
+        self.assertEqual(NextOfKin.objects.count(), 0)
+        self.assertEqual(MotivationText.objects.count(), 0)
+        self.assertEqual(ThresholdValue.objects.count(), 0)

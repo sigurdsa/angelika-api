@@ -307,7 +307,6 @@ class PostMeasurementTests(AngelikaAPITestCase):
         self.assertEqual(Measurement.objects.count(), 2)
         self.assertEqual(Alarm.objects.count(), 2)  # another alarm has been created
 
-
     def test_update_daily_activity_measurement(self):
         hub_user = self.create_hub('hub1')
         larsoverhaug = Patient.objects.get(user__username='larsoverhaug')

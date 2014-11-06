@@ -15,6 +15,9 @@ from datetime import timedelta
 from rest_framework.decorators import detail_route
 from rest_framework.exceptions import ParseError
 from threshold_value.models import ThresholdValue
+from django.contrib.auth.models import User, Group
+from uuid import uuid4
+from rest_framework import status
 
 
 class PatientViewSet(viewsets.ModelViewSet):
@@ -26,6 +29,71 @@ class PatientViewSet(viewsets.ModelViewSet):
             return PatientListSerializer
         else:
             return PatientDetailSerializer
+
+    def create(self, request, *args, **kwargs):
+        patient_data = request.DATA
+        user_data = patient_data.pop('user', None)
+        if user_data is None:
+            raise ParseError(detail='User is not specified')
+        next_of_kin_data = patient_data.pop('next_of_kin', None)
+        motivation_text_data = patient_data.pop('motivational_texts', None)
+        information_text_data = patient_data.pop('information_texts', None)
+        o2_min_data = patient_data.pop('o2_min', None)
+        o2_max_data = patient_data.pop('o2_max', None)
+        pulse_min_data = patient_data.pop('pulse_min', None)
+        pulse_max_data = patient_data.pop('pulse_max', None)
+        temperature_min_data = patient_data.pop('temperature_min', None)
+        temperature_max_data = patient_data.pop('temperature_max', None)
+
+        username = uuid4().hex[:10]  # TODO: humanize this, f.ex. make it a combination of first_name and last_name
+        password = "perper"  # TODO: do not hard code this
+        patient_user = User.objects.create(username=username, password=password, **user_data)
+        patient_group = Group.objects.get(name='patients')
+        patient_user.groups.add(patient_group)
+
+        patient = Patient.objects.create(
+            user=patient_user,
+            **patient_data
+        )
+
+        if next_of_kin_data and len(next_of_kin_data) > 0:
+            for i in range(len(next_of_kin_data)):
+                next_of_kin_dict = next_of_kin_data[i]
+                NextOfKin.objects.create(priority=i, patient=patient, **next_of_kin_dict)
+
+        if motivation_text_data and len(motivation_text_data) > 0:
+            for i in range(len(motivation_text_data)):
+                motivation_text_dict = motivation_text_data[i]
+                MotivationText.objects.create(type='M', patient=patient, **motivation_text_dict)
+
+        if information_text_data and len(information_text_data) > 0:
+            for i in range(len(information_text_data)):
+                information_text_dict = information_text_data[i]
+                MotivationText.objects.create(type='I', patient=patient, **information_text_dict)
+
+        def create_threshold_value(value, type, is_upper_threshold):
+            ThresholdValue.objects.create(
+                value=value,
+                patient=patient,
+                type=type,
+                is_upper_threshold=is_upper_threshold
+            )
+
+        if o2_min_data:
+            create_threshold_value(o2_min_data, 'O', False)
+        if o2_max_data:
+            create_threshold_value(o2_max_data, 'O', True)
+        if pulse_min_data:
+            create_threshold_value(pulse_min_data, 'P', False)
+        if pulse_max_data:
+            create_threshold_value(pulse_max_data, 'P', True)
+        if temperature_min_data:
+            create_threshold_value(temperature_min_data, 'T', False)
+        if temperature_max_data:
+            create_threshold_value(temperature_max_data, 'T', True)
+
+        serializer = PatientDetailSerializer(instance=patient)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
         kwargs['partial'] = True
