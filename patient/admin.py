@@ -6,6 +6,7 @@ from django import forms
 class CustomPatientForm(forms.ModelForm):
     class Meta:
         model = Patient
+        exclude = []
 
     def __init__(self, *args, **kwargs):
         super(CustomPatientForm, self).__init__(*args, **kwargs)
