@@ -12,7 +12,9 @@ class NextOfKin(models.Model):
     relation = models.CharField(null=True, max_length=40, blank=True)
 
     def __unicode__(self):
-        return smart_unicode(self.full_name)
+        s = self.full_name + ", med relasjon " +\
+            self.relation + " til " + self.patient.user.get_full_name()
+        return smart_unicode(s)
 
     class Meta():
         ordering = ['priority']
