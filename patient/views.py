@@ -18,7 +18,7 @@ from threshold_value.models import ThresholdValue
 from django.contrib.auth.models import User, Group
 from uuid import uuid4
 from rest_framework import status
-from django.db import IntegrityError
+from .helpers import generate_username
 
 
 class PatientViewSet(viewsets.ModelViewSet):
@@ -53,7 +53,11 @@ class PatientViewSet(viewsets.ModelViewSet):
         temperature_min_data = patient_data.pop('temperature_min', None)
         temperature_max_data = patient_data.pop('temperature_max', None)
 
-        username = uuid4().hex[:10]  # TODO: humanize this, f.ex. make it a combination of first_name and last_name
+        username = generate_username(
+            user_data['first_name'],
+            user_data['last_name'],
+            patient_data['national_identification_number'][4:6]
+        )
         password = "perper"  # TODO: do not hard code this
         patient_user = User.objects.create(username=username, password=password, **user_data)
         patient_group = Group.objects.get(name='patients')

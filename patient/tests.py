@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 from test.testcase import AngelikaAPITestCase
 from patient.models import Patient
 from next_of_kin.models import NextOfKin
@@ -8,6 +9,8 @@ from django.utils import timezone
 from datetime import timedelta
 from threshold_value.models import ThresholdValue
 from django.contrib.auth.models import User
+from rest_framework.test import APITestCase
+from .helpers import generate_username
 
 
 class PermissionTests(AngelikaAPITestCase):
@@ -684,6 +687,7 @@ class PostTests(AngelikaAPITestCase):
         self.assertEqual(response.status_code, 201)  # Created
         self.assertTrue('user' in response.data)
         self.assertEqual(User.objects.last().last_name, "Sprellemann")
+        self.assertEqual(User.objects.last().username, "pes")
         self.assertEqual(Patient.objects.last().national_identification_number, "13057675847")
         self.assertEqual(NextOfKin.objects.count(), 2)
         self.assertEqual(NextOfKin.objects.last().full_name, 'Trond Sprellemann')
@@ -734,3 +738,18 @@ class PostTests(AngelikaAPITestCase):
 
         response2 = self.client.post('/patients/', data, 'json')
         self.assertEqual(response2.status_code, 409)  # Conflict
+
+
+class UsernameHelperTests(APITestCase):
+    def test_generate_username(self):
+        usernames = set()
+        for i in range(30):
+            username = generate_username('Glenn', u'Halsten Haraldsen', '90')
+            User.objects.create_user(username, username + '@angelika.no', 'test')
+            self.assertFalse(username in usernames)
+            usernames.add(username)
+
+    def test_generate_username_from_weird_characters(self):
+        username = generate_username(u'blablabla"#¤%¤#%=(/(', u'æåøÆØÅØ=)"#¤sfsdf', 'dfjh')
+        self.assertFalse(u'ø' in username)
+        self.assertFalse(u'#' in username)
