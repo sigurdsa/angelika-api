@@ -7,6 +7,7 @@ from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 from motivation_text.models import MotivationText
 from rest_framework.exceptions import ParseError
+from motivation_text.serializers import MotivationTextSerializer
 
 
 class AlarmViewSet(viewsets.ModelViewSet):
@@ -49,8 +50,10 @@ class AlarmViewSet(viewsets.ModelViewSet):
                     text=motivation_text_dict['text']
                 )
 
-            serializer = PatientAlarmSerializer(instance=alarm)
-            return Response(serializer.data)
+            alarm_serializer = PatientAlarmSerializer(instance=alarm)
+            motivation_text_serializer = MotivationTextSerializer(instance=motivation_text)
+
+            return Response({'alarm': alarm_serializer.data, 'motivation_text': motivation_text_serializer.data})
 
         except KeyError:
             raise ParseError()
