@@ -9,7 +9,6 @@ class AngelikaAPITestCase(APITestCase):
 
         health_professional_group = Group.objects.create(name='health-professionals')
         health_professional_user = User.objects.create_user('helselise', 'lise@angelika.no', 'test')
-        health_professional_user.save()
         health_professional_user.groups.add(health_professional_group)
 
         self.create_patient('larsoverhaug', 'Lars', 'Overhaug', '03023576487')
