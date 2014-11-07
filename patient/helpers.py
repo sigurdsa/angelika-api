@@ -17,10 +17,6 @@ def sanitize_name(name):
     return s
 
 
-def username_exists(username):
-    return User.objects.filter(username=username).exists()
-
-
 def generate_username(first_name, last_name, birth_year):
     first_name = sanitize_name(first_name)
     last_name = sanitize_name(last_name)
@@ -48,8 +44,13 @@ def generate_username(first_name, last_name, birth_year):
     for i in range(num_suggestions):
         suggestions.append(suggestions[i] + uuid4().hex[:3])
 
-    for suggestion in suggestions:
-        if not username_exists(suggestion):
-            return suggestion
+    # exclude existing usernames from list of suggestions
+    existing_usernames = User.objects.filter(username__in=suggestions).values('username')
+    for d in existing_usernames:
+        if d['username'] in suggestions:
+            suggestions.remove(d['username'])
+
+    if suggestions:
+        return suggestions[0]
 
     return uuid4().hex[:10]
