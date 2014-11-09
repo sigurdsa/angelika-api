@@ -4,6 +4,7 @@ from rest_framework import routers
 from alarm import views as alarm_views
 from patient import views as patient_views
 from measurement import views as measurement_views
+from motivation_text import views as motivation_text_views
 
 router = routers.DefaultRouter()
 router.register(r'alarms', alarm_views.AlarmViewSet, base_name='Alarms')
@@ -19,4 +20,5 @@ urlpatterns = patterns(
     url(r'^current-patient/graph_data/', measurement_views.CurrentPatientMeasurements.as_view()),
     url(r'^current-patient/', patient_views.CurrentPatient.as_view()),
     url(r'^post-measurements/', measurement_views.PostMeasurements.as_view()),
+    url(r'^motivation_texts/delete_old/', motivation_text_views.DeleteOldMotivationTexts.as_view()),
 )

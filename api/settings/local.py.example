@@ -3,6 +3,7 @@ from api.settings import base
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'uwk$zoh26l^nc!#02+ui2(5n+1w*agn=u-+v6yzend4fzry$)%'
+CRON_KEY = 'b2ab7d0adc76626e473e2504eb6bed16'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
