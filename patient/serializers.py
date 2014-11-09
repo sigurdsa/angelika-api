@@ -53,10 +53,13 @@ class PatientListSerializer(serializers.ModelSerializer):
         yyyy = "20" + obj.national_identification_number[4:6]
         if int(yyyy) >= today.year:
             yyyy = str(int(yyyy) - 100)
-        birth_date = datetime.datetime.strptime(ddmm + yyyy, "%d%m%Y")
-        diff = today - birth_date
-        num_years = int(diff.days / 365.2425)  # rough estimate, can be wrong in some edge cases
-        return num_years
+        try:
+            birth_date = datetime.datetime.strptime(ddmm + yyyy, "%d%m%Y")
+            diff = today - birth_date
+            num_years = int(diff.days / 365.2425)  # rough estimate, can be wrong in some edge cases
+            return num_years
+        except ValueError:
+            return None
 
     class Meta:
         model = Patient
