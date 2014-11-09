@@ -1,6 +1,9 @@
 from motivation_text.models import MotivationText
 from patient.models import Patient
 from test.testcase import AngelikaAPITestCase
+from django.utils import timezone
+from datetime import timedelta
+from django.conf import settings
 
 
 class TestMotivation(AngelikaAPITestCase):
@@ -8,7 +11,6 @@ class TestMotivation(AngelikaAPITestCase):
         first_patient = Patient.objects.first()
         motivation_text = MotivationText(
             patient=first_patient,
-            time_created='2014-10-24T09:46:20Z',
             text='HEI'
         )
         self.assertEqual(motivation_text.text, 'HEI')
@@ -19,7 +21,6 @@ class TestMotivation(AngelikaAPITestCase):
         MotivationText.objects.create(
             patient=first_patient,
             text='HEI',
-            time_created='2014-10-24T09:46:20Z',
             type='I'
         )
         response = self.client.get('/current-patient/')
@@ -32,9 +33,35 @@ class TestMotivation(AngelikaAPITestCase):
         MotivationText.objects.create(
             patient=first_patient,
             text='HEI',
-            time_created='2014-10-24T09:46:20Z',
             type='M'
         )
         response = self.client.get('/current-patient/')
 
         self.assertTrue('motivation_texts' in response.data)
+
+
+class TestCronjobs(AngelikaAPITestCase):
+    def test_delete_old_motivation_texts(self):
+        first_patient = Patient.objects.first()
+        text = MotivationText.objects.create(
+            patient=first_patient,
+            text='Alle liker deg',
+            type='M'
+        )
+        text.time_created = timezone.now() - timedelta(days=40)
+        text.save()
+        MotivationText.objects.create(
+            patient=first_patient,
+            text='Jakka di er jammen fin!',
+            type='M'
+        )
+        MotivationText.objects.create(
+            patient=first_patient,
+            text='Fisk er sunt!',
+            type='I'
+        )
+
+        response = self.client.post('/motivation_texts/delete_old/?cron_key=' + settings.CRON_KEY)
+        self.assertEqual(response.status_code, 200)  # OK
+        self.assertEqual(response.data['num_deleted_rows'], 1)
+        self.assertEqual(MotivationText.objects.count(), 2)
