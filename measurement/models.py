@@ -28,6 +28,7 @@ class Measurement(models.Model):
     METERS = 'M'
     KCAL = 'K'
     SECONDS = 'C'
+    CELSIUS = 'D'
     NONE = ''
     UNITS = [
         (BPM, 'BPM'),
@@ -35,16 +36,16 @@ class Measurement(models.Model):
         (STEPS, 'Steps'),
         (METERS, 'Meters'),
         (KCAL, 'KCal'),
-        (SECONDS,'Seconds'),
+        (SECONDS, 'Seconds'),
+        (CELSIUS, 'Degrees celsius'),
         (NONE, '')
     ]
-    unit = models.CharField(max_length=1, choices=UNITS, null=False, default=NONE)
-
+    unit = models.CharField(max_length=1, choices=UNITS, null=False, blank=True, default=NONE)
 
     def __unicode__(self):
         return smart_unicode(
-            self.type + " = " + str(self.value) + " " + self.unit + " @ " + str(self.time) + " for " + self.patient.user.first_name
-            + " " + self.patient.user.last_name
+            self.type + " = " + str(self.value) + " " + self.unit + " @ " + str(self.time)
+            + " for " + self.patient.user.get_full_name()
         )
 
     class Meta():
