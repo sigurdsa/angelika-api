@@ -16,7 +16,6 @@ from rest_framework.decorators import detail_route
 from rest_framework.exceptions import ParseError
 from threshold_value.models import ThresholdValue
 from django.contrib.auth.models import User, Group
-from uuid import uuid4
 from rest_framework import status
 from .helpers import generate_username
 
