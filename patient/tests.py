@@ -659,6 +659,10 @@ class PostTests(AngelikaAPITestCase):
                 'o2_access': False,
                 'pulse_access': False,
                 'temperature_access': False,
+                'show_activity': True,
+                'show_o2': False,
+                'show_pulse': True,
+                'show_temperature': False,
 
                 'next_of_kin': [
                     {
@@ -689,6 +693,8 @@ class PostTests(AngelikaAPITestCase):
         self.assertEqual(User.objects.last().last_name, "Sprellemann")
         self.assertEqual(User.objects.last().username, "pes")
         self.assertEqual(Patient.objects.last().national_identification_number, "13057675847")
+        self.assertEqual(Patient.objects.last().activity_access, True)
+        self.assertEqual(Patient.objects.last().show_temperature, False)
         self.assertEqual(NextOfKin.objects.count(), 2)
         self.assertEqual(NextOfKin.objects.last().full_name, 'Trond Sprellemann')
         self.assertEqual(MotivationText.objects.count(), 2)

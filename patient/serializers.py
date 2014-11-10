@@ -165,7 +165,11 @@ class PatientDetailSerializer(PatientListSerializer):
             'activity_access',
             'pulse_access',
             'o2_access',
-            'temperature_access'
+            'temperature_access',
+            'show_activity',
+            'show_pulse',
+            'show_o2',
+            'show_temperature'
         ]
 
 

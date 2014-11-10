@@ -32,6 +32,23 @@ class Patient(models.Model):
         help_text="If True, the patient has access to view temperature data in patient interface"
     )
 
+    show_activity = models.BooleanField(
+        default=True,
+        help_text="If True, activity data is shown in the interface for health professionals"
+    )
+    show_pulse = models.BooleanField(
+        default=True,
+        help_text="If True, heart rate data is shown in the interface for health professionals"
+    )
+    show_o2 = models.BooleanField(
+        default=True,
+        help_text="If True, O2 data is shown in the interface for health professionals"
+    )
+    show_temperature = models.BooleanField(
+        default=True,
+        help_text="If True, temperature data is shown in the interface for health professionals"
+    )
+
     def __unicode__(self):
         name = self.user.get_full_name()
         if len(name) <= 2:
