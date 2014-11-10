@@ -7,12 +7,15 @@ import time
 
 
 class PostMeasurementTests(AngelikaAPITestCase):
-    def test_post_ignored_measurements(self):
+    def create_and_authenticate_hub(self):
         hub_user = self.create_hub('hub1')
-        larsoverhaug = Patient.objects.get(user__username='larsoverhaug')
-        larsoverhaug.hub = hub_user
-        larsoverhaug.save()
+        self.patient = Patient.objects.get(user__username='larsoverhaug')
+        self.patient.hub = hub_user
+        self.patient.save()
         self.force_authenticate('hub1')
+
+    def test_post_ignored_measurements(self):
+        self.create_and_authenticate_hub()
 
         data = {
             "Measurements": [
@@ -48,7 +51,7 @@ class PostMeasurementTests(AngelikaAPITestCase):
         self.assertEqual(response.data["num_measurements_created"], 1)  # One object created
         self.assertEqual(Measurement.objects.count(), 1)  # One object created
         self.assertAlmostEqual(Measurement.objects.first().value, 1067.0)  # Correct no of steps
-        self.assertEqual(Measurement.objects.first().patient, larsoverhaug)  # Correct patient
+        self.assertEqual(Measurement.objects.first().patient, self.patient)  # Correct patient
         self.assertEqual(Alarm.objects.count(), 0)
 
     def test_post_when_not_authenticated(self):
@@ -56,12 +59,7 @@ class PostMeasurementTests(AngelikaAPITestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_post_bad_hub_id(self):
-        hub_user = self.create_hub('hub1')
-        larsoverhaug = Patient.objects.get(user__username='larsoverhaug')
-        larsoverhaug.hub = hub_user
-        larsoverhaug.save()
-        self.force_authenticate('hub1')
-
+        self.create_and_authenticate_hub()
         data = {
             "Measurements": [
                 {
@@ -79,21 +77,17 @@ class PostMeasurementTests(AngelikaAPITestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_post_abnormal_low_measurements(self):
-        hub_user = self.create_hub('hub1')
-        larsoverhaug = Patient.objects.get(user__username='larsoverhaug')
-        larsoverhaug.hub = hub_user
-        larsoverhaug.save()
-        self.force_authenticate('hub1')
+        self.create_and_authenticate_hub()
 
         ThresholdValue.objects.create(
             value=49,
-            patient=larsoverhaug,
+            patient=self.patient,
             type='P',
             is_upper_threshold=False,
         )
         ThresholdValue.objects.create(
             value=165,
-            patient=larsoverhaug,
+            patient=self.patient,
             type='P',
             is_upper_threshold=True,
         )
@@ -121,21 +115,17 @@ class PostMeasurementTests(AngelikaAPITestCase):
         self.assertEqual(Alarm.objects.first().measurement.pk, Measurement.objects.first().pk)
 
     def test_post_abnormal_high_measurement(self):
-        hub_user = self.create_hub('hub1')
-        larsoverhaug = Patient.objects.get(user__username='larsoverhaug')
-        larsoverhaug.hub = hub_user
-        larsoverhaug.save()
-        self.force_authenticate('hub1')
+        self.create_and_authenticate_hub()
 
         ThresholdValue.objects.create(
             value=49,
-            patient=larsoverhaug,
+            patient=self.patient,
             type='P',
             is_upper_threshold=False,
         )
         ThresholdValue.objects.create(
             value=165,
-            patient=larsoverhaug,
+            patient=self.patient,
             type='P',
             is_upper_threshold=True,
         )
@@ -163,21 +153,17 @@ class PostMeasurementTests(AngelikaAPITestCase):
         self.assertEqual(Alarm.objects.first().measurement.pk, Measurement.objects.first().pk)
 
     def test_post_high_o2_measurement(self):
-        hub_user = self.create_hub('hub1')
-        larsoverhaug = Patient.objects.get(user__username='larsoverhaug')
-        larsoverhaug.hub = hub_user
-        larsoverhaug.save()
-        self.force_authenticate('hub1')
+        self.create_and_authenticate_hub()
 
         ThresholdValue.objects.create(
             value=60,
-            patient=larsoverhaug,
+            patient=self.patient,
             type='O',
             is_upper_threshold=False,
         )
         ThresholdValue.objects.create(
             value=85,
-            patient=larsoverhaug,
+            patient=self.patient,
             type='O',
             is_upper_threshold=True,
         )
@@ -204,21 +190,17 @@ class PostMeasurementTests(AngelikaAPITestCase):
         self.assertEqual(Alarm.objects.count(), 0)  # no alarm is created for a "too high" O2 value
 
     def test_post_abnormal_low_measurements_repeatedly(self):
-        hub_user = self.create_hub('hub1')
-        larsoverhaug = Patient.objects.get(user__username='larsoverhaug')
-        larsoverhaug.hub = hub_user
-        larsoverhaug.save()
-        self.force_authenticate('hub1')
+        self.create_and_authenticate_hub()
 
         ThresholdValue.objects.create(
             value=49,
-            patient=larsoverhaug,
+            patient=self.patient,
             type='P',
             is_upper_threshold=False,
         )
         ThresholdValue.objects.create(
             value=165,
-            patient=larsoverhaug,
+            patient=self.patient,
             type='P',
             is_upper_threshold=True,
         )
@@ -265,27 +247,22 @@ class PostMeasurementTests(AngelikaAPITestCase):
         self.assertEqual(Alarm.objects.count(), 1)  # no new alarm has been created
 
     def test_post_abnormal_low_measurements_multiple_patients(self):
-        hub_user1 = self.create_hub('hub1')
-        larsoverhaug = Patient.objects.get(user__username='larsoverhaug')
-        larsoverhaug.hub = hub_user1
-        larsoverhaug.save()
+        self.create_and_authenticate_hub()
 
         hub_user2 = self.create_hub('hub2')
         kristin = self.create_patient('kristin', 'Kristin Hegine', 'Taraldsen', '08105534879')
         kristin.hub = hub_user2
         kristin.save()
 
-        self.force_authenticate('hub1')
-
         ThresholdValue.objects.create(
             value=49,
-            patient=larsoverhaug,
+            patient=self.patient,
             type='P',
             is_upper_threshold=False,
         )
         ThresholdValue.objects.create(
             value=165,
-            patient=larsoverhaug,
+            patient=self.patient,
             type='P',
             is_upper_threshold=True,
         )
@@ -347,11 +324,7 @@ class PostMeasurementTests(AngelikaAPITestCase):
         self.assertEqual(Alarm.objects.count(), 2)  # another alarm has been created
 
     def test_update_daily_activity_measurement(self):
-        hub_user = self.create_hub('hub1')
-        larsoverhaug = Patient.objects.get(user__username='larsoverhaug')
-        larsoverhaug.hub = hub_user
-        larsoverhaug.save()
-        self.force_authenticate('hub1')
+        self.create_and_authenticate_hub()
 
         measurement_time = int(time.time())
         data = {
