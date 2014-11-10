@@ -85,17 +85,17 @@ class PostMeasurementTests(AngelikaAPITestCase):
         larsoverhaug.save()
         self.force_authenticate('hub1')
 
-        lower_threshold_value = ThresholdValue.objects.create(
+        ThresholdValue.objects.create(
             value=49,
             patient=larsoverhaug,
             type='P',
             is_upper_threshold=False,
         )
-        upper_threshold_value = ThresholdValue.objects.create(
+        ThresholdValue.objects.create(
             value=165,
             patient=larsoverhaug,
             type='P',
-            is_upper_threshold=False,
+            is_upper_threshold=True,
         )
 
         measurement_time = int(time.time()) + 10000
@@ -120,7 +120,7 @@ class PostMeasurementTests(AngelikaAPITestCase):
         self.assertEqual(Alarm.objects.count(), 1)
         self.assertEqual(Alarm.objects.first().measurement.pk, Measurement.objects.first().pk)
 
-    def test_post_abnormal_high_measurements(self):
+    def test_post_abnormal_high_measurement(self):
         hub_user = self.create_hub('hub1')
         larsoverhaug = Patient.objects.get(user__username='larsoverhaug')
         larsoverhaug.hub = hub_user
@@ -137,7 +137,7 @@ class PostMeasurementTests(AngelikaAPITestCase):
             value=165,
             patient=larsoverhaug,
             type='P',
-            is_upper_threshold=False,
+            is_upper_threshold=True,
         )
 
         measurement_time = int(time.time()) + 10000
@@ -162,6 +162,47 @@ class PostMeasurementTests(AngelikaAPITestCase):
         self.assertEqual(Alarm.objects.count(), 1)
         self.assertEqual(Alarm.objects.first().measurement.pk, Measurement.objects.first().pk)
 
+    def test_post_high_o2_measurement(self):
+        hub_user = self.create_hub('hub1')
+        larsoverhaug = Patient.objects.get(user__username='larsoverhaug')
+        larsoverhaug.hub = hub_user
+        larsoverhaug.save()
+        self.force_authenticate('hub1')
+
+        ThresholdValue.objects.create(
+            value=60,
+            patient=larsoverhaug,
+            type='O',
+            is_upper_threshold=False,
+        )
+        ThresholdValue.objects.create(
+            value=85,
+            patient=larsoverhaug,
+            type='O',
+            is_upper_threshold=True,
+        )
+
+        measurement_time = int(time.time()) + 10000
+        data = {
+            "Measurements": [
+                {
+                    "date": measurement_time,
+                    "type": "spo2",
+                    "unit": "percent",
+                    "value": 89
+                }
+            ],
+            "Observation": {
+                "hub_id": "hub1"
+            }
+        }
+
+        response = self.client.post('/post-measurements/', data, 'json')
+
+        self.assertEqual(response.status_code, 201)  # Created
+        self.assertEqual(Measurement.objects.count(), 1)
+        self.assertEqual(Alarm.objects.count(), 0)  # no alarm is created for a "too high" O2 value
+
     def test_post_abnormal_low_measurements_repeatedly(self):
         hub_user = self.create_hub('hub1')
         larsoverhaug = Patient.objects.get(user__username='larsoverhaug')
@@ -169,17 +210,17 @@ class PostMeasurementTests(AngelikaAPITestCase):
         larsoverhaug.save()
         self.force_authenticate('hub1')
 
-        lower_threshold_value = ThresholdValue.objects.create(
+        ThresholdValue.objects.create(
             value=49,
             patient=larsoverhaug,
             type='P',
             is_upper_threshold=False,
         )
-        upper_threshold_value = ThresholdValue.objects.create(
+        ThresholdValue.objects.create(
             value=165,
             patient=larsoverhaug,
             type='P',
-            is_upper_threshold=False,
+            is_upper_threshold=True,
         )
 
         measurement_time = int(time.time()) + 10000
@@ -246,7 +287,7 @@ class PostMeasurementTests(AngelikaAPITestCase):
             value=165,
             patient=larsoverhaug,
             type='P',
-            is_upper_threshold=False,
+            is_upper_threshold=True,
         )
 
         ThresholdValue.objects.create(
@@ -259,7 +300,7 @@ class PostMeasurementTests(AngelikaAPITestCase):
             value=160,
             patient=kristin,
             type='P',
-            is_upper_threshold=False,
+            is_upper_threshold=True,
         )
 
         measurement_time = int(time.time()) + 10000

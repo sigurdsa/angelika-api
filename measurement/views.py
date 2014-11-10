@@ -128,6 +128,18 @@ class PostMeasurements(APIView):
         if not measurement.type in ['O', 'P', 'T']:
             return None
 
+        upper_threshold_value = ThresholdValue.objects.filter(
+            patient=measurement.patient,
+            type=measurement.type,
+            is_upper_threshold=True,
+            time__lte=measurement.time
+        ).last()
+
+        too_high = upper_threshold_value and measurement.value > upper_threshold_value.value
+
+        if measurement.type == 'O' and too_high:
+            return None  # Don't create an alarm when O2 is too high
+
         lower_threshold_value = ThresholdValue.objects.filter(
             patient=measurement.patient,
             type=measurement.type,
@@ -135,15 +147,9 @@ class PostMeasurements(APIView):
             time__lte=measurement.time
         ).last()
 
-        upper_threshold_value = ThresholdValue.objects.filter(
-            patient=measurement.patient,
-            type=measurement.type,
-            is_upper_threshold=False,
-            time__lte=measurement.time
-        ).last()
+        too_low = lower_threshold_value and measurement.value < lower_threshold_value.value
 
-        if (lower_threshold_value and measurement.value < lower_threshold_value.value)\
-                or (upper_threshold_value and measurement.value > upper_threshold_value.value):
+        if too_low or too_high:
             # check if there's already an untreated alarm for this incident
             recent_untreated_alarm = Alarm.objects.filter(
                 measurement__patient=measurement.patient,
