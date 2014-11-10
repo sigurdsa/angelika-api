@@ -18,7 +18,7 @@ class PermissionTests(AngelikaAPITestCase):
         response = self.client.get('/patients/')
         self.assertEqual(response.status_code, 401)  # UNAUTHORIZED
 
-    def test_patient_list(self):
+    def test_patient_list_authorized(self):
         self.force_authenticate('helselise')
         response = self.client.get('/patients/')
         self.assertEqual(response.status_code, 200)  # OK
