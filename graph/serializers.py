@@ -48,4 +48,4 @@ class ThresholdValueGraphSeriesSerializer(GraphSeriesSerializer):
 class SimpleAlarmSerializer(serializers.ModelSerializer):
     class Meta:
         model = Alarm
-        fields = ('id', 'time_created', 'is_treated', 'treated_text')
+        fields = ['is_treated']
