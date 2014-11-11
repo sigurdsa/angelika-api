@@ -137,6 +137,7 @@ class PostTests(AngelikaAPITestCase):
                 'alarm': {
                     'is_treated': True,
                     'treated_text': 'Ensom',
+                    'search_tag': 'Sorg',
                 },
                 'motivation_text': {
                     'text': 'Ta en kaffe med Ole-Petter'
@@ -148,6 +149,7 @@ class PostTests(AngelikaAPITestCase):
         self.assertEqual(response.status_code, 200)  # OK
         self.assertEqual(response.data['alarm']['treated_text'], 'Ensom')
         self.assertEqual(response.data['alarm']['is_treated'], True)
+        self.assertEqual(response.data['alarm']['search_tag'], 'Sorg')
         self.assertEqual(response.data['motivation_text']['text'], 'Ta en kaffe med Ole-Petter')
         self.assertTrue('id' in response.data['motivation_text'])
         self.assertEqual(MotivationText.objects.count(), 1)
@@ -166,16 +168,19 @@ class PostTests(AngelikaAPITestCase):
         )
 
         self.force_authenticate('helselise')
-        self.client.post(
+        response = self.client.post(
             '/alarms/' + str(alarm1.id) + '/handle/',
             {
                 'alarm': {
                     'is_treated': True,
                     'treated_text': 'Ensom',
+                    'search_tag': 'Sorg'
                 },
                 'motivation_text': {'text': ''}
             },
             'json'
         )
 
+        self.assertEqual(response.status_code, 200)  # OK
         self.assertEqual(MotivationText.objects.count(), 0)
+        self.assertEqual(response.data['alarm']['search_tag'], 'Sorg')
