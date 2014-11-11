@@ -4,11 +4,21 @@ angelika-api
 Backend (API) for project Angelika - health tracking  
 The frontend is in a [separate repository](https://github.com/iver56/angelika-web)
 
-# Virtualenv
+## Get set up
+* Have virtualenv, pip, python, make
+* Create your virtualenv folder with the name "venv": `virtualenv venv`
+* `make install`
+* `cp api/settings/local.py.example api/settings/local.py`
+* `make migrate`
 
-Create your virtualenv folder with the name "venv"
+### User groups
+On /admin/auth/group/ you should have the following groups:
+* admins
+* health-professionals
+* hubs
+* patients
 
-# Commands
+## Commands
 
 `make install`
 Install dependencies that are specified in requirements.txt
@@ -25,11 +35,10 @@ Create migrations. Do this after you have changed one or more models. Commit the
 `make shell`
 Start the interactive Python shell in your terminal. Here, you can play around with the API Django gives you.
 
-
 `make test`
 Run all the tests
 
-# Contribution guidelines
+## Contribution guidelines
 * Commit your changes to a seperate branch
 * "One" feature or bug fix per branch (easier to review)
 * `make migrations` should be the last thing you do before commiting changes done in models
@@ -37,9 +46,3 @@ Run all the tests
 * Code style: PEP 8
 * Max line length: 100 characters
 
-# User groups
-On /admin/auth/group/ you should have the following groups:
-* admins
-* health-professionals
-* hubs
-* patients
