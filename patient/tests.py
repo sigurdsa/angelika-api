@@ -596,7 +596,7 @@ class GetGraphDataTests(AngelikaAPITestCase):
         self.assertEqual(len(response.data['measurements']), 2)
         self.assertTrue('alarm' in response.data['measurements'][0])
         self.assertEqual(response.data['measurements'][0]['alarm'], None)
-        self.assertEqual(response.data['measurements'][1]['alarm']['id'], alarm.id)
+        self.assertEqual(response.data['measurements'][1]['alarm']['is_treated'], False)
 
 
 class CurrentPatientTests(AngelikaAPITestCase):
