@@ -41,6 +41,7 @@ class AlarmViewSet(viewsets.ModelViewSet):
             alarm = self.get_object()
             alarm.is_treated = alarm_dict['is_treated']
             alarm.treated_text = alarm_dict['treated_text']
+            alarm.search_tag = alarm_dict['search_tag']
             alarm.save()
 
             motivation_text = None
