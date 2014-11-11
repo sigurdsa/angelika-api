@@ -4,15 +4,16 @@ angelika-api
 Backend (API) for project Angelika - health tracking  
 The frontend is in a [separate repository](https://github.com/iver56/angelika-web)
 
-## Get set up
+## Setup
 * Have virtualenv, pip, python, make
 * Create your virtualenv folder with the name "venv": `virtualenv venv`
-* `make install`
 * `cp api/settings/local.py.example api/settings/local.py`
+* `make install`
 * `make migrate`
+* You can now run `make run` and visit localhost:8000 in your favorite browser
 
 ### User groups
-On /admin/auth/group/ you should have the following groups:
+On /admin/auth/group/ you create groups with the following names:
 * admins
 * health-professionals
 * hubs
