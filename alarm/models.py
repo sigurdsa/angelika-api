@@ -19,7 +19,12 @@ class Alarm(models.Model):
         ordering = ['is_treated', '-time_created']
 
     def __unicode__(self):
-        s = "Alarm at " + str(self.time_created)
+        reason = ""
+        if self.reason:
+            reason = "High"
+        elif False == self.reason:
+            reason = "Low"
+        s = "Alarm: " + reason + " " + self.measurement.type + " at " + str(self.time_created)
         if self.measurement:
             s += " for " + self.measurement.patient.user.get_full_name()
         return smart_unicode(s)
