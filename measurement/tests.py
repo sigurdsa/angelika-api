@@ -113,6 +113,7 @@ class PostMeasurementTests(AngelikaAPITestCase):
         self.assertEqual(Measurement.objects.count(), 1)
         self.assertEqual(Alarm.objects.count(), 1)
         self.assertEqual(Alarm.objects.first().measurement.pk, Measurement.objects.first().pk)
+        self.assertEqual(Alarm.objects.first().is_measurement_too_high, False)
 
     def test_post_abnormal_high_measurement(self):
         self.create_and_authenticate_hub()
@@ -151,6 +152,7 @@ class PostMeasurementTests(AngelikaAPITestCase):
         self.assertEqual(Measurement.objects.count(), 1)
         self.assertEqual(Alarm.objects.count(), 1)
         self.assertEqual(Alarm.objects.first().measurement.pk, Measurement.objects.first().pk)
+        self.assertEqual(Alarm.objects.first().is_measurement_too_high, True)
 
     def test_post_high_o2_measurement(self):
         self.create_and_authenticate_hub()
