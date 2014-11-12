@@ -26,7 +26,11 @@ class AlarmViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         patient_id = self.request.QUERY_PARAMS.get('patient_id', None)
         if patient_id is None:
-            return Alarm.objects.all().select_related('measurement__patient__user')
+            only_untreated = self.request.QUERY_PARAMS.get('only_untreated', None)
+            if only_untreated:
+                return Alarm.objects.filter(is_treated=False).select_related('measurement__patient__user')
+            else:
+                return Alarm.objects.all().select_related('measurement__patient__user')
         if not patient_id.isdigit():
             raise ParseError(detail="patient_id is not numeric")
 

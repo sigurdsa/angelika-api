@@ -74,6 +74,41 @@ class GetTests(AngelikaAPITestCase):
         self.assertEqual(alarm1['measurement']['type'], 'P')
         self.assertEqual(alarm1['measurement']['patient']['user']['full_name'], 'Kari Nordmann')
 
+    def test_list_only_untreated(self):
+        self.force_authenticate('helselise')
+
+        patient1 = Patient.objects.first()
+        measurement1 = Measurement.objects.create(
+            type='O',
+            value=90.5,
+            patient=patient1,
+            time=timezone.now() - timedelta(days=1)
+        )
+        Alarm.objects.create(
+            measurement=measurement1,
+            time_created=timezone.now(),
+            is_treated=True
+        )
+
+        patient2 = self.create_patient('karinordmann', 'Kari', 'Nordmann', '02105534875')
+        measurement2 = Measurement.objects.create(
+            type='P',
+            value=63,
+            patient=patient2,
+            time=timezone.now()
+        )
+        Alarm.objects.create(
+            measurement=measurement2,
+            time_created=timezone.now(),
+            is_treated=False
+        )
+
+        response = self.client.get('/alarms/?only_untreated=1')
+        self.assertEqual(response.data['count'], 1)
+        self.assertTrue('results' in response.data)
+        alarms = response.data['results']
+        self.assertEqual(alarms[0]['measurement']['type'], 'P')
+
     def test_list_filtered_by_patient(self):
         self.force_authenticate('helselise')
 
