@@ -9,8 +9,8 @@ class Alarm(models.Model):
     is_treated = models.BooleanField(default=False, null=False)
     treated_text = models.TextField(default="", blank=True)
     search_tag = models.CharField(default="", blank=True, max_length=50)
-    is_measurement_too_high = models.NullBooleanField(
-        null=True, blank=True,
+    reason = models.NullBooleanField(
+        null=True, blank=True, default=None,
         help_text="If true, the alarm was created because of a too high measurement. If false, the alarm was"
                   " created because of a too low measurement. Otherwise NULL."
     )

@@ -23,5 +23,5 @@ class PatientAlarmSerializer(serializers.ModelSerializer):
             'is_treated',
             'treated_text',
             'search_tag',
-            'is_measurement_too_high'
+            'reason'
         )

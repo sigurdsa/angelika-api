@@ -11,7 +11,7 @@ class CustomAlarmForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(CustomAlarmForm, self).__init__(*args, **kwargs)
-        self.fields['measurement'].queryset = Measurement.objects.filter(alarm__isnull=True, type__in=['O', 'P', 'T'])
+        self.fields['measurement'].queryset = Measurement.objects.filter(type__in=['O', 'P', 'T', 'C'])
 
 
 class AlarmAdmin(admin.ModelAdmin):

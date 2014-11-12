@@ -157,12 +157,12 @@ class PostMeasurements(APIView):
                 is_treated=False
             ).first()
             if not recent_untreated_alarm:
-                is_measurement_too_high = False
+                reason = False
                 if too_high:
-                    is_measurement_too_high = True
+                    reason = True
                 return Alarm.objects.create(
                     measurement=measurement,
-                    is_measurement_too_high=is_measurement_too_high
+                    reason=reason
                 )
 
         return None
