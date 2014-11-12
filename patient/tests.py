@@ -615,6 +615,8 @@ class CurrentPatientTests(AngelikaAPITestCase):
         ).count()
         self.assertEqual(num_measurements, 1)
         self.assertEqual(num_alarms, 1)
+        alarm = Alarm.objects.first()
+        self.assertEqual(alarm.is_measurement_too_high, None)
 
     def test_call_me_request_repeatedly(self):
         user = self.force_authenticate('larsoverhaug')
