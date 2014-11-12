@@ -629,6 +629,27 @@ class CurrentPatientTests(AngelikaAPITestCase):
         ).count()
         self.assertEqual(num_requested, 1)
 
+    def test_call_me_request_repeatedly_after_timeout(self):
+        user = self.force_authenticate('larsoverhaug')
+        response = self.client.post('/current-patient/call_me/', {}, format='json')
+        self.assertEqual(response.data['status'], 'ok')
+
+        call_me_request = Measurement.objects.get(
+            patient=user.patient,
+            type='C',  # CALL_ME_REQUEST
+        )
+        call_me_request.time = timezone.now() - timedelta(minutes=6)
+        call_me_request.save()
+
+        response = self.client.post('/current-patient/call_me/', {}, format='json')
+        self.assertEqual(response.data['status'], 'ok')
+
+        num_requested = Measurement.objects.filter(
+            patient=user.patient,
+            type='C',  # CALL_ME_REQUEST
+        ).count()
+        self.assertEqual(num_requested, 2)
+
 
 class PostTests(AngelikaAPITestCase):
     def test_create_patient(self):

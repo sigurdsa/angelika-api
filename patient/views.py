@@ -252,7 +252,7 @@ class CurrentPatientCallMeRequest(APIView):
         num_already_requested = Measurement.objects.filter(
             patient=current_patient,
             type='C',  # CALL_ME_REQUEST
-            time__gt=timezone.now() - timedelta(hours=1)
+            time__gt=timezone.now() - timedelta(minutes=5)
         ).count()
 
         if num_already_requested >= 1:
