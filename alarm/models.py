@@ -4,7 +4,7 @@ from django.utils.encoding import smart_unicode
 
 
 class Alarm(models.Model):
-    measurement = models.ForeignKey(Measurement, null=True)
+    measurement = models.OneToOneField(Measurement, null=True)
     time_created = models.DateTimeField(null=False, auto_now_add=True, auto_now=False)
     is_treated = models.BooleanField(default=False, null=False)
     treated_text = models.TextField(default="", blank=True)
