@@ -8,7 +8,13 @@ class AlarmSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Alarm
-        fields = ('id', 'measurement', 'time_created', 'is_treated', 'reason')
+        fields = (
+            'id',
+            'measurement',
+            'time_created',
+            'is_treated',
+            'reason'
+        )
 
 
 class PatientAlarmSerializer(serializers.ModelSerializer):

@@ -18,7 +18,7 @@ class AlarmViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         patient_id = self.request.QUERY_PARAMS.get('patient_id', None)
-        if patient_id is None:
+        if patient_id is None and self.action == 'list':
             return AlarmSerializer
         else:
             return PatientAlarmSerializer
