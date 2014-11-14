@@ -1,12 +1,13 @@
 from django.db import models
 from patient.models import Patient
 from django.utils.encoding import smart_unicode
+from django.utils import timezone
 
 
 class ThresholdValue(models.Model):
     patient = models.ForeignKey(Patient, null=False, blank=False)
     value = models.FloatField(null=False, blank=False)
-    time = models.DateTimeField(null=False, auto_now_add=True, auto_now=False)
+    time = models.DateTimeField(null=False, default=timezone.now())
     is_upper_threshold = models.BooleanField(
         null=False, blank=False, default=False,
         help_text="If true, the threshold value is upper, if false, the threshold value is lower"
