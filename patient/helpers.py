@@ -54,3 +54,7 @@ def generate_username(first_name, last_name, birth_year):
         return suggestions[0]
 
     return uuid4().hex[:10]
+
+
+def get_sound_filename():
+    return uuid4().hex[:30] + ".mp3"

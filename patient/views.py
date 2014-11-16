@@ -18,6 +18,9 @@ from threshold_value.models import ThresholdValue
 from django.contrib.auth.models import User, Group
 from rest_framework import status
 from .helpers import generate_username
+from .helpers import get_sound_filename
+from base64 import b64decode
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 class PatientViewSet(viewsets.ModelViewSet):
@@ -43,7 +46,7 @@ class PatientViewSet(viewsets.ModelViewSet):
         if user_data is None:
             raise ParseError(detail='User is not specified')
         next_of_kin_data = patient_data.pop('next_of_kin', None)
-        motivation_text_data = patient_data.pop('motivational_texts', None)
+        motivation_text_data = patient_data.pop('motivation_texts', None)
         information_text_data = patient_data.pop('information_texts', None)
         o2_min_data = patient_data.pop('o2_min', None)
         o2_max_data = patient_data.pop('o2_max', None)
@@ -75,6 +78,12 @@ class PatientViewSet(viewsets.ModelViewSet):
         if motivation_text_data and len(motivation_text_data) > 0:
             for i in range(len(motivation_text_data)):
                 motivation_text_dict = motivation_text_data[i]
+                if 'sound' in motivation_text_dict:
+                    sound = motivation_text_dict['sound']
+                    if sound.get('is_updated', False):
+                        mp3_filename = get_sound_filename()
+                        mp3_file = SimpleUploadedFile(mp3_filename, b64decode(sound['base64']))
+                        motivation_text_dict['sound'] = mp3_file
                 MotivationText.objects.create(type='M', patient=patient, **motivation_text_dict)
 
         if information_text_data and len(information_text_data) > 0:
@@ -136,10 +145,20 @@ class PatientViewSet(viewsets.ModelViewSet):
             for motivation_text_dict in request.DATA['motivation_texts']:
                 if 'time_created' in motivation_text_dict:
                     del motivation_text_dict['time_created']
+                if 'sound' in motivation_text_dict:
+                    sound = motivation_text_dict.pop('sound')
+                    if sound.get('is_updated', False):
+                        mp3_filename = get_sound_filename()
+                        mp3_file = SimpleUploadedFile(mp3_filename, b64decode(sound['base64']))
+                        motivation_text_dict['sound'] = mp3_file
                 if 'id' in motivation_text_dict and motivation_text_dict['id']:
                     motivation_text_ids.append(motivation_text_dict['id'])
-                    MotivationText.objects.filter(id=motivation_text_dict['id']).update(
-                        **motivation_text_dict)
+                    motivation_text = MotivationText.objects.get(id=motivation_text_dict['id'])
+                    if 'sound' in motivation_text_dict:
+                        motivation_text.sound = motivation_text_dict['sound']
+                    if 'text' in motivation_text_dict:
+                        motivation_text.text = motivation_text_dict['text']
+                    motivation_text.save()
                 else:
                     new_motivation_text = MotivationText(type='M', patient_id=kwargs['pk'],
                                                          **motivation_text_dict)

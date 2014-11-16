@@ -6,7 +6,7 @@ from django.utils.encoding import smart_unicode
 class MotivationText(models.Model):
     patient = models.ForeignKey(Patient, null=False)
     text = models.TextField(default='', blank=False)
-
+    sound = models.FileField(null=True, blank=True, help_text="Must be mp3")
     time_created = models.DateTimeField(null=False, auto_now_add=True, auto_now=False)
 
     def __unicode__(self):
