@@ -661,6 +661,17 @@ class GetGraphDataTests(AngelikaAPITestCase):
 
 
 class CurrentPatientTests(AngelikaAPITestCase):
+    def test_get_current_patient_data(self):
+        user = self.force_authenticate('larsoverhaug')
+        patient = user.patient
+        MotivationText.objects.create(text='Yo Lars, hva skjer?', patient=patient, type='M')
+        MotivationText.objects.create(text='Nederlandsk ost er relativt digg', patient=patient, type='I')
+
+        response = self.client.get('/current-patient/')
+        self.assertEqual(response.status_code, 200)  # OK
+        self.assertTrue('motivation_texts' in response.data)
+        self.assertTrue('information_texts' in response.data)
+
     def test_call_me_request(self):
         user = self.force_authenticate('larsoverhaug')
         response = self.client.post('/current-patient/call_me/', {}, format='json')

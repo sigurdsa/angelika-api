@@ -9,6 +9,14 @@ class MotivationText(models.Model):
     sound = models.FileField(null=True, blank=True, help_text="Must be mp3")
     time_created = models.DateTimeField(null=False, auto_now_add=True, auto_now=False)
 
+    TEXT_INFORMATION = 'I'
+    TEXT_MOTIVATION = 'M'
+    TYPES = [
+        (TEXT_INFORMATION, 'InformationText'),
+        (TEXT_MOTIVATION, 'MotivationText'),
+    ]
+    type = models.CharField(max_length=1, choices=TYPES, null=False, default='M')
+
     def __unicode__(self):
         return smart_unicode(
             ("InformationText" if self.type == 'I' else 'MotivationText')
@@ -18,11 +26,3 @@ class MotivationText(models.Model):
 
     class Meta():
         ordering = ['-id']
-
-    TEXT_INFORMATION = 'I'
-    TEXT_MOTIVATION = 'M'
-    TYPES = [
-        (TEXT_INFORMATION, 'InformationText'),
-        (TEXT_MOTIVATION, 'MotivationText'),
-    ]
-    type = models.CharField(max_length=1, choices=TYPES, null=False, default='M')

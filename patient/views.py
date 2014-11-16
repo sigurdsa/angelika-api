@@ -258,7 +258,7 @@ class CurrentPatient(APIView):
 
     def get(self, request, format=None):
         patient = request.user.patient
-        serializer = CurrentPatientSerializer(instance=patient)
+        serializer = CurrentPatientSerializer(instance=patient, context={'request': request})
         return Response(serializer.data)
 
 
