@@ -50,10 +50,10 @@ def generate_username(first_name, last_name, birth_year):
         if d['username'] in suggestions:
             suggestions.remove(d['username'])
 
-    if suggestions:
+    if len(suggestions) > 0:
         return suggestions[0]
 
-    return uuid4().hex[:10]
+    return uuid4().hex[:20]
 
 
 def get_sound_filename():
