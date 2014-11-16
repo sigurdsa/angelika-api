@@ -112,7 +112,7 @@ class PatientViewSet(viewsets.ModelViewSet):
         if temperature_max_data:
             create_threshold_value(temperature_max_data, 'T', True)
 
-        serializer = PatientDetailSerializer(instance=patient)
+        serializer = PatientDetailSerializer(instance=patient, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
