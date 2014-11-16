@@ -5,6 +5,7 @@ from alarm import views as alarm_views
 from patient import views as patient_views
 from measurement import views as measurement_views
 from motivation_text import views as motivation_text_views
+from django.conf import settings
 
 router = routers.DefaultRouter()
 router.register(r'alarms', alarm_views.AlarmViewSet, base_name='Alarms')
@@ -22,3 +23,9 @@ urlpatterns = patterns(
     url(r'^post-measurements/', measurement_views.PostMeasurements.as_view()),
     url(r'^motivation_texts/delete_old/', motivation_text_views.DeleteOldMotivationTexts.as_view()),
 )
+
+if settings.DEBUG:
+    # static files (images, css, javascript, etc.)
+    urlpatterns += patterns('',
+                            (r'^media/(?P<path>.*)$', 'django.views.static.serve', {
+                                'document_root': settings.MEDIA_ROOT}))

@@ -24,5 +24,3 @@ DATABASES = {
         'NAME': os.path.join(base.BASE_DIR, '../db.sqlite3'),
     }
 }
-
-MEDIA_ROOT = 'media/'
