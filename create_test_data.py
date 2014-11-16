@@ -15,7 +15,7 @@ from threshold_value.models import ThresholdValue
 Running this file will create 500 random patients with 500 measurements and 30 threshold values for each patient
 To run this file:
 $ make shell
->>> execfile('testdata/create_test_data.py')
+>>> execfile('create_test_data.py')
 """
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "api.settings")
@@ -26,7 +26,6 @@ class CreateTestData():
     def get_list_from_file(self, filename):
         dirname = os.path.dirname('__file__')
         path = os.path.join(dirname, filename)
-        print path
         f = codecs.open(path, 'r', "utf-8")
         lines = [line.rstrip() for line in f]
         f.close()
@@ -166,7 +165,7 @@ def run():
     print 'Creating 500 patients, 15 000 threshold values and 250 000 measurements. Watch your database grow.'
     for i in range(num_new_users):
         c.create_random_patient_with_measurements()
-        if i % 50 == 0:
+        if i > 0 and i % 50 == 0:
             print str(float(100 * i) / num_new_users) + "% done"
     print "Done!"
 
