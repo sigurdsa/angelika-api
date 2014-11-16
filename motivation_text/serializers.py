@@ -14,4 +14,4 @@ class MotivationTextSerializer(serializers.ModelSerializer):
     def get_sound(self, obj):
         if obj.sound:
             return {'url': self.context['request'].build_absolute_uri(obj.sound.url)}
-        return {}
+        return None
