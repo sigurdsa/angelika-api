@@ -266,6 +266,33 @@ class PatchTests(AngelikaAPITestCase):
         motivation_text = motivation_text.first()
         self.assertEqual(motivation_text.text, 'HEI')
 
+    def test_add_motivation_text_with_sound(self):
+        self.force_authenticate('helselise')
+        first_patient = Patient.objects.first()
+
+        self.client.patch(
+            '/patients/' + str(first_patient.id) + '/',
+            {
+                'motivation_texts': [
+                    {
+                        'id': None,
+                        'text': 'HEI',
+                        'sound': {
+                            'base64': "//sUxAAAA+hrJBQRAAiXEifDDIABABfgB/+QmQn8k4GBgYGBgYAAAAAAAAAIAw8PP8AAAB36vVuJiq8Bnfa265+K9XsKop+9xJ/N6ETUHJCYfwo7ghL8YYOZck4HwQh4//sUxAMABIiFQhhigAiUEijDEDAB0jnQfa9jOtSpazWZzglxd1cvOzlmIq0dTRjCXdAW8fthDJIqNcluHk7//J/OWwWZoYIdKGcmr7BTYtpQpzmJp4Vww1UQ2KOVQB7D//sUxAOARRiDRXyRAAiOBWlwBJgZxGE4HR+CUEDDC7FOyjlZ3T3WxpZ9mmn2qgUCuAIeg7m59Gc8010oHEQGZfBETlHA6Jhk6o9wcSZe/nCmbWZ+n/zfpXuGlQ3FEmnA//sUxAKARKiFQ2AkYIiRjihijDAAE2QSJgdIJh8CtYYiwrrldpfKVj8svK65yLK5UbfNYLnKv/oH/KQoGUWiyXKN1nEFRT3fPPrwiG7lc/0sfNATgIQFyLdS2r4Q2qbp//sUxAMABPiVThg4AACQEerThnABnctP/VqrZi5dM7pbEUTpMTxOMgpSn0CfLiRhD9wFAibjuFVsttHs4NEFaoEZxIUrop9P/27vsap7d9TAEDcRAdgVOfx+Qgucanq5//sUxAKARLglYeAwwICIhez0AwwunNogABwJmTssnL4DWy+RQLMDwqcJC+NZ0iIMv0DxK3WoWba7WxEihMhJIJoFSBh60jJI9w4LlkGSoAJkKlE1d7xPGRp////IkQAB//sUxAQARBwfV6AMwAB6g+nwAwwQAPgRI3cNIG88EljAKLWOTMAXkSV6ktKa1iSSS2zQHNISOszfgBAGJBsCByomdIHrkoJKfrbfHIUSW27SYBaDnkxMLZCAI5oUOPoP//sUxAmARAwjTWAkwIB8ieowAwg4gPtHOa4wgxMqOMn78YLr7fbTUdYBQFqJoRNL10I28WhFIt/vKLLM2q3qe961EcllknAAB9NwjhQigxTtLgAZPOKc2yIDsT/3luU0//sUxA8AQ/yHTYGETcB0AupwAaQEtwou1v/25SAi4fUQv7lCogCgXBFSigveATRT7SNESBbbbbZ/IANbBMiz5ZDiJbwokEDbVFYhKAHkfcadFlPF1r21syLEgDJISaZQ//sUxBYAQ+gpZYAYQPB9BSmwBIgQkRUE8NW081QnUQc3FAHoaeCeig==",
+                            'is_updated': True
+                        }
+                    }
+                ]
+            },
+            format='json'
+        )
+
+        motivation_text = MotivationText.objects.filter(type='M', patient=first_patient)
+        self.assertEqual(len(motivation_text), 1)
+        motivation_text = motivation_text.first()
+        self.assertEqual(motivation_text.sound.size, 904)
+        motivation_text.sound.delete(save=False)
+
     def test_update_motivation_text(self):
         self.force_authenticate('helselise')
         first_patient = Patient.objects.first()
@@ -297,6 +324,40 @@ class PatchTests(AngelikaAPITestCase):
 
         # time_created should not be updated as it is read only
         self.assertNotEqual("%s" % motivation_text.time_created, '2014-10-24 09:46:20+00:00')
+
+    def test_update_motivation_text_with_sound(self):
+        self.force_authenticate('helselise')
+        first_patient = Patient.objects.first()
+
+        motivation_text = MotivationText.objects.create(
+            patient=first_patient,
+            text='HEI',
+            time_created='2014-10-24T09:46:20Z'
+        )
+
+        self.client.patch(
+            '/patients/' + str(first_patient.id) + '/',
+            {
+                'motivation_texts': [
+                    {
+                        'id': motivation_text.id,
+                        'time_created': '2014-10-24T09:46:20Z',
+                        'sound': {
+                            'base64': "//sUxAAAA+hrJBQRAAiXEifDDIABABfgB/+QmQn8k4GBgYGBgYAAAAAAAAAIAw8PP8AAAB36vVuJiq8Bnfa265+K9XsKop+9xJ/N6ETUHJCYfwo7ghL8YYOZck4HwQh4//sUxAMABIiFQhhigAiUEijDEDAB0jnQfa9jOtSpazWZzglxd1cvOzlmIq0dTRjCXdAW8fthDJIqNcluHk7//J/OWwWZoYIdKGcmr7BTYtpQpzmJp4Vww1UQ2KOVQB7D//sUxAOARRiDRXyRAAiOBWlwBJgZxGE4HR+CUEDDC7FOyjlZ3T3WxpZ9mmn2qgUCuAIeg7m59Gc8010oHEQGZfBETlHA6Jhk6o9wcSZe/nCmbWZ+n/zfpXuGlQ3FEmnA//sUxAKARKiFQ2AkYIiRjihijDAAE2QSJgdIJh8CtYYiwrrldpfKVj8svK65yLK5UbfNYLnKv/oH/KQoGUWiyXKN1nEFRT3fPPrwiG7lc/0sfNATgIQFyLdS2r4Q2qbp//sUxAMABPiVThg4AACQEerThnABnctP/VqrZi5dM7pbEUTpMTxOMgpSn0CfLiRhD9wFAibjuFVsttHs4NEFaoEZxIUrop9P/27vsap7d9TAEDcRAdgVOfx+Qgucanq5//sUxAKARLglYeAwwICIhez0AwwunNogABwJmTssnL4DWy+RQLMDwqcJC+NZ0iIMv0DxK3WoWba7WxEihMhJIJoFSBh60jJI9w4LlkGSoAJkKlE1d7xPGRp////IkQAB//sUxAQARBwfV6AMwAB6g+nwAwwQAPgRI3cNIG88EljAKLWOTMAXkSV6ktKa1iSSS2zQHNISOszfgBAGJBsCByomdIHrkoJKfrbfHIUSW27SYBaDnkxMLZCAI5oUOPoP//sUxAmARAwjTWAkwIB8ieowAwg4gPtHOa4wgxMqOMn78YLr7fbTUdYBQFqJoRNL10I28WhFIt/vKLLM2q3qe961EcllknAAB9NwjhQigxTtLgAZPOKc2yIDsT/3luU0//sUxA8AQ/yHTYGETcB0AupwAaQEtwou1v/25SAi4fUQv7lCogCgXBFSigveATRT7SNESBbbbbZ/IANbBMiz5ZDiJbwokEDbVFYhKAHkfcadFlPF1r21syLEgDJISaZQ//sUxBYAQ+gpZYAYQPB9BSmwBIgQkRUE8NW081QnUQc3FAHoaeCeig==",
+                            'is_updated': True
+                        }
+                    }
+                ]
+            },
+            format='json'
+        )
+
+        motivation_texts = MotivationText.objects.filter(type='M', patient=first_patient)
+        self.assertEqual(len(motivation_texts), 1)
+        motivation_text = motivation_texts.first()
+        self.assertEqual(motivation_text.text, 'HEI')
+        self.assertEqual(motivation_text.sound.size, 904)
+        motivation_text.sound.delete(save=False)
 
     def test_remove_motivation_text(self):
         self.force_authenticate('helselise')
@@ -701,7 +762,7 @@ class PostTests(AngelikaAPITestCase):
                         'relation': 'Far'
                     }
                 ],
-                'motivational_texts': [
+                'motivation_texts': [
                     {'text': 'Det er sol i dag! :)'}
                 ],
                 'information_texts': [
