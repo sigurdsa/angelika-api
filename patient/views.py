@@ -24,7 +24,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 class PatientViewSet(viewsets.ModelViewSet):
-    queryset = Patient.objects.all()
+    queryset = Patient.objects.all().select_related('user')
     permission_classes = (IsAuthenticated, IsHealthProfessional,)
 
     def get_serializer_class(self):
