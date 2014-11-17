@@ -58,7 +58,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
-    'PAGINATE_BY': 500,
+    'PAGINATE_BY': 200,
     'PAGINATE_BY_PARAM': 'page_size',
     'MAX_PAGINATE_BY': 5000,
     'DEFAULT_AUTHENTICATION_CLASSES': (
