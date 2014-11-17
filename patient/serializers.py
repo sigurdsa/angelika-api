@@ -180,7 +180,7 @@ class CurrentPatientSerializer(serializers.ModelSerializer):
 
     def get_motivation_texts(self, obj):
         motivation_texts = MotivationText.objects.filter(patient=obj, type='M')
-        serializer = MotivationTextSerializer(motivation_texts, many=True, context=self.context)
+        serializer = MotivationTextWithSoundSerializer(motivation_texts, many=True, context=self.context)
         return serializer.data
 
     def get_information_texts(self, obj):
