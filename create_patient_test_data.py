@@ -15,14 +15,14 @@ from threshold_value.models import ThresholdValue
 Running this file will create 500 random patients with 500 measurements and 30 threshold values for each patient
 To run this file:
 $ make shell
->>> execfile('create_test_data.py')
+>>> execfile('create_patient_test_data.py')
 """
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "api.settings")
 django.setup()
 
 
-class CreateTestData():
+class CreatePatientTestData():
     def get_list_from_file(self, filename):
         dirname = os.path.dirname('__file__')
         path = os.path.join(dirname, filename)
@@ -150,17 +150,9 @@ class CreateTestData():
         )
         return patient
 
-    def create_hub(self, username):
-        hub_group, created = Group.objects.get_or_create(name='hubs')
-        hub_user = User.objects.create_user(username, username + '@hotmail.com', 'test')
-        hub_user.save()
-        hub_user.groups.add(hub_group)
-
-        return hub_user
-
 
 def run():
-    c = CreateTestData()
+    c = CreatePatientTestData()
     num_new_users = 500
     print 'Creating 500 patients, 15 000 threshold values and 250 000 measurements. Watch your database grow.'
     for i in range(num_new_users):
