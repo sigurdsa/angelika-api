@@ -5,7 +5,7 @@ import datetime
 from next_of_kin.models import NextOfKin
 from next_of_kin.serializers import NextOfKinSerializer
 from motivation_text.models import MotivationText
-from motivation_text.serializers import MotivationTextSerializer
+from motivation_text.serializers import MotivationTextSerializer, MotivationTextWithSoundSerializer
 from measurement.models import Measurement
 from graph.serializers import MeasurementGraphSeriesSerializer, ThresholdValueGraphSeriesSerializer
 from threshold_value.models import ThresholdValue
@@ -92,7 +92,7 @@ class PatientDetailSerializer(PatientListSerializer):
 
     def get_motivation_texts(self, obj):
         motivation_texts = MotivationText.objects.filter(patient__id=obj.id, type='M')
-        serializer = MotivationTextSerializer(motivation_texts, many=True, context=self.context)
+        serializer = MotivationTextWithSoundSerializer(motivation_texts, many=True, context=self.context)
         return serializer.data
 
     def get_information_texts(self, obj):

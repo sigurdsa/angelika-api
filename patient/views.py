@@ -160,8 +160,7 @@ class PatientViewSet(viewsets.ModelViewSet):
                         motivation_text.text = motivation_text_dict['text']
                     motivation_text.save()
                 else:
-                    new_motivation_text = MotivationText(type='M', patient_id=kwargs['pk'],
-                                                         **motivation_text_dict)
+                    new_motivation_text = MotivationText(type='M', patient_id=kwargs['pk'], **motivation_text_dict)
                     new_motivation_text.save()
                     motivation_text_ids.append(new_motivation_text.id)
 

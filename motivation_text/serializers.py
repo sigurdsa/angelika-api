@@ -4,12 +4,17 @@ from rest_framework.serializers import SerializerMethodField
 
 
 class MotivationTextSerializer(serializers.ModelSerializer):
-    sound = SerializerMethodField('get_sound')
-
     class Meta:
         model = MotivationText
-        fields = ('id', 'time_created', 'text', 'sound')
+        fields = ['id', 'time_created', 'text']
         read_only_fields = ('time_created',)
+
+
+class MotivationTextWithSoundSerializer(MotivationTextSerializer):
+    sound = SerializerMethodField('get_sound')
+
+    class Meta(MotivationTextSerializer.Meta):
+        fields = MotivationTextSerializer.Meta.fields + ['sound']
 
     def get_sound(self, obj):
         if obj.sound:
