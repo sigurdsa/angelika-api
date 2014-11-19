@@ -216,7 +216,7 @@ class PatientGraphSeriesSerializer(serializers.ModelSerializer):
             patient=obj,
             type=self.context['type'],
             time__gte=self.context['min_time']
-        )
+        ).order_by('-time')[:1000][::-1]  # only get the 1000 last measurements (due to client side limitations)
         if 'exclude_measurement_alarms' in self.context and self.context['exclude_measurement_alarms']:
             serializer = MeasurementGraphSeriesSerializer(measurements, many=True)
             return serializer.data
