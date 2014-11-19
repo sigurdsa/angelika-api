@@ -1,8 +1,13 @@
-angelika-api
+Angelika
 ============
 
-Backend (API) for project Angelika - health tracking  
-The frontend is in a [separate repository](https://github.com/iver56/angelika-web)
+This is the back-end (API) for project Angelika. This was a [customer driven project (TDT4290)](http://www.idi.ntnu.no/emner/tdt4290/) at [NTNU](http://www.ntnu.edu/).
+
+Other components of the system:
+
+* [angelika-web](https://github.com/iver56/angelika-web)
+* [angelika-hub](https://github.com/torgeha/angelika-hub)
+
 
 ## Setup
 * Have virtualenv, pip, python, make
@@ -13,7 +18,7 @@ The frontend is in a [separate repository](https://github.com/iver56/angelika-we
 * You can now run `make run` and visit localhost:8000 in your favorite browser
 
 ### User groups
-On /admin/auth/group/ you create groups with the following names:
+On /admin/auth/group/ you should create groups with the following names:
 * admins
 * health-professionals
 * hubs
