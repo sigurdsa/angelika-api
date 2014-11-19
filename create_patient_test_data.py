@@ -12,7 +12,7 @@ from measurement.models import Measurement
 from threshold_value.models import ThresholdValue
 
 """
-Running this file will create 500 random patients with 500 measurements and 30 threshold values for each patient
+Running this file will create a number of random patients measurements and threshold values for each patient
 To run this file:
 $ make shell
 >>> execfile('create_patient_test_data.py')
@@ -72,7 +72,7 @@ class CreatePatientTestData():
     def get_random_phone_number(self):
         return str(random.randint(40000000, 99999999))
 
-    def create_random_patient_with_measurements(self):
+    def create_random_patient_with_measurements(self, num_measurements, time_delta):
         first_name, last_name = self.get_random_name()
         birth_day = self.get_random_birth_day()
         birth_month = self.get_random_birth_month()
@@ -82,18 +82,48 @@ class CreatePatientTestData():
         phone_number = self.get_random_phone_number()
 
         patient = self.create_patient(username, first_name, last_name, national_identification_number, phone_number)
+        self.create_random_measurements(patient, num_measurements, time_delta)
+        self.create_random_threshold_values(patient, num_measurements, time_delta)
         print "Created patient", patient
-        self.create_random_measurements(patient)
-        self.create_random_threshold_values(patient)
 
-    def create_random_measurements(self, patient):
-        num_days = 100
-        then = timezone.now() - timedelta(days=num_days)
+    def get_random_measurement_value(self, measurement_type):
+        if measurement_type == 'A':
+            return random.randint(5000, 10000)
+        elif measurement_type == 'O':
+            return round(random.uniform(90, 96), 1)
+        elif measurement_type == 'P':
+            return random.randint(50, 100)
+        elif measurement_type == 'T':
+            return round(random.uniform(36, 38.5), 1)
+        else:
+            return 0
+
+    def get_random_threshold_value(self, measurement_type, is_upper_threshold):
+        if measurement_type == 'O':
+            if is_upper_threshold:
+                return round(random.uniform(96, 100), 1)
+            else:
+                return round(random.uniform(80, 90), 1)
+        elif measurement_type == 'P':
+            if is_upper_threshold:
+                return random.randint(120, 150)
+            else:
+                return random.randint(40, 50)
+        elif measurement_type == 'T':
+            if is_upper_threshold:
+                return round(random.uniform(39, 40), 1)
+            else:
+                return round(random.uniform(35, 36), 1)
+        else:
+            return 0
+
+    def create_random_measurements(self, patient, num_measurements, time_delta):
+        then = timezone.now() - timedelta(seconds=((num_measurements-1)*time_delta))
         measurements = []
-        for measurement_type in ['A', 'C', 'O', 'P', 'T']:
-            for i in range(num_days):
-                measurement_time = then + timedelta(days=i)
-                measurement_value = round(random.uniform(40, 100), 1)
+        for measurement_type in ['A', 'O', 'P', 'T']:
+            for i in range(num_measurements):
+                measurement_time = then + timedelta(seconds=(i*time_delta))
+                measurement_value = self.get_random_measurement_value(measurement_type)
                 measurement = Measurement(
                     patient=patient,
                     value=measurement_value,
@@ -103,14 +133,13 @@ class CreatePatientTestData():
                 measurements.append(measurement)
         Measurement.objects.bulk_create(measurements)
 
-    def create_random_threshold_values(self, patient):
-        num_days = 100
-        then = timezone.now() - timedelta(days=num_days)
+    def create_random_threshold_values(self, patient, num_measurements, time_delta):
+        then = timezone.now() - timedelta(seconds=(num_measurements*time_delta))
         threshold_values = []
         for measurement_type in ['O', 'P', 'T']:
-            for i in range(int(num_days / 10) - 1):
-                threshold_value_time = then + timedelta(days=i*10)
-                lower_threshold_value = round(random.uniform(10, 39), 1)
+            for i in range(int(num_measurements / 1000) + 1):
+                threshold_value_time = then + timedelta(seconds=(i*1000*time_delta))
+                lower_threshold_value = self.get_random_threshold_value(measurement_type, False)
                 lower_threshold_value = ThresholdValue(
                     patient=patient,
                     value=lower_threshold_value,
@@ -118,7 +147,7 @@ class CreatePatientTestData():
                     type=measurement_type,
                     is_upper_threshold=False
                 )
-                upper_threshold_value = round(random.uniform(100, 140), 1)
+                upper_threshold_value = self.get_random_threshold_value(measurement_type, True)
                 upper_threshold_value = ThresholdValue(
                     patient=patient,
                     value=upper_threshold_value,
@@ -152,11 +181,15 @@ class CreatePatientTestData():
 
 
 def run():
+    num_new_users = int(input('Number of new users to create? '))
+    num_measurements_per_user = int(input('Number of measurements per type per user? '))
+    measurements_time_delta = int(input('Time delta between each measurement (in seconds)? '))
+    if measurements_time_delta <= 0:
+        return "Wrong input for time delta. Must be a positive integer."
     c = CreatePatientTestData()
-    num_new_users = 500
-    print 'Creating 500 patients, 15 000 threshold values and 250 000 measurements. Watch your database grow.'
+    print 'The database is being populated with test data...'
     for i in range(num_new_users):
-        c.create_random_patient_with_measurements()
+        c.create_random_patient_with_measurements(num_measurements_per_user, measurements_time_delta)
         if i > 0 and i % 50 == 0:
             print str(float(100 * i) / num_new_users) + "% done"
     print "Done!"
